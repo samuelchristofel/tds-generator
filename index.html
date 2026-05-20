@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Avian TDS System - Create New Document</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            avian: {
+              dark: '#004d32',
+              primary: '#006442',
+              light: '#008558',
+              accent: '#f39200',
+              sidebar: '#111827',
+              bg: '#f3f4f6'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scroll">
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+  </style>
+<style data-purpose="layout-styles">
+    .sidebar-item-active {
+      background-color: rgba(0, 100, 66, 0.2);
+      border-left: 4px solid #006442;
+      color: #10b981;
+    }
+    .card-header-avian {
+      background-color: #006442;
+      color: white;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script>
+    function renumberRows() {
+      const rows = document.querySelectorAll('#fitur-table-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').textContent = index + 1;
+      });
+    }
+
+    function removeRow(btn) {
+      const row = btn.closest('tr');
+      row.remove();
+      renumberRows();
+    }
+
+    function addRow() {
+      const tbody = document.getElementById('fitur-table-body');
+      const rowCount = tbody.querySelectorAll('tr').length;
+      const newRow = document.createElement('tr');
+      newRow.className = 'divide-y';
+      newRow.innerHTML = `
+        <td class="px-6 py-4 row-number">${rowCount + 1}</td>
+        <td class="px-6 py-4">
+          <div class="space-y-2">
+            <select class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" onchange="handleSelectChange(this)">
+              <option value="" disabled selected>Pilih Fitur...</option>
+              <option>Mencegah tembok lembab</option>
+              <option>Tahan Cuaca</option>
+              <option>Elastis</option>
+              <option>Daya rekat terbaik</option>
+              <option>Menutup Retak Rambut dengan Sempurna</option>
+              <option>Melindungi dari karat</option>
+              <option>Tahan Alkali dan Effloresence</option>
+              <option>Green label Singapore</option>
+              <option value="Others">Others (isi sendiri)</option>
+            </select>
+            <input class="hidden w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" placeholder="Others (isi sendiri)" type="text"/>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <button class="text-red-500 hover:text-red-700" onclick="removeRow(this)">
+            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(newRow);
+    }
+
+    function handleSelectChange(select) {
+      const input = select.nextElementSibling;
+      if (select.value === 'Others') {
+        input.classList.remove('hidden');
+      } else {
+        input.classList.add('hidden');
+      }
+    }
+  </script><script>
+    function limitCheckboxes(selector, max) {
+      const checkboxes = document.querySelectorAll(selector);
+      const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+      
+      checkboxes.forEach(cb => {
+        if (!cb.checked) {
+          cb.disabled = checkedCount >= max;
+          cb.parentElement.classList.toggle('opacity-50', checkedCount >= max);
+          cb.parentElement.classList.toggle('cursor-not-allowed', checkedCount >= max);
+        }
+      });
+    }
+  </script><script>
+// Templates for each spec card — used to restore when re-checked
+const SPEC_CARD_TEMPLATES = {
+  'warna': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">WARNA</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('warna')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="ASTM D1475"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="Input warna..." type="text"/></div></div>`,
+  'penampilan': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">PENAMPILAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('penampilan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><select class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary"><option>Tidak Kilap</option><option>Sedang</option><option>Kilap</option><option>Powder</option></select></div></div>`,
+  'kemasan': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KEMASAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kemasan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" placeholder="Input kemasan..."/></div></div>`,
+  'pengencer': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">PENGENCER</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('pengencer')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><select class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary"><option>Air bersih</option><option>Avia Thinner Enamel</option><option>Thinner B</option><option>Afduner</option></select></div></div>`,
+  'bj25': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">BERAT JENIS 25°C</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('bj25')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="ASTM D1475"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'daya-sebar': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">DAYA SEBAR TEORITIS</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('daya-sebar')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="m²/kg/lapis" type="text"/></div></div>`,
+  'tebal-film': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KETEBALAN FILM PER LAPIS</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tebal-film')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><div class="space-y-2"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-medium text-gray-600 w-12">Basah</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div><div class="flex items-center gap-2"><span class="text-[10px] font-medium text-gray-600 w-12">Kering</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div></div></div></div>`,
+  'cara-aplikasi': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">CARA APLIKASI</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('cara-aplikasi')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><div class="grid grid-cols-2 gap-2"><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Kuas</span></label><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Roll</span></label><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Spray</span></label><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Airless Spray</span></label></div></div></div>`,
+  'kadar-padatan': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KADAR PADATAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kadar-padatan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input %" type="text"/></div></div>`,
+  'waktu-kering': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">WAKTU KERING 25°C</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('waktu-kering')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><div class="space-y-2"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-medium text-gray-600 w-24">Kering Sentuh</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-medium text-gray-600 w-24">Kering Keras</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div><div class="flex items-center gap-2"><span class="text-[10px] font-medium text-gray-600 w-24">Kering Amplas</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div></div></div></div>`,
+  'tenggang-waktu': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[8px] font-bold uppercase">TENGGANG WAKTU ANTAR LAPISAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tenggang-waktu')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input jam..." type="text"/></div></div>`,
+  'lapis-anjur': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[8px] font-bold uppercase">JUMLAH LAPISAN DIANJURKAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('lapis-anjur')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input jumlah..." type="text"/></div></div>`,
+  'kekentalan': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KEKENTALAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kekentalan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'bj30': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">BERAT JENIS 30°C</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('bj30')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="ASTM D1475"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'tahan-kotoran': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KETAHANAN TERHADAP KOTORAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tahan-kotoran')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'tahan-eff': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KETAHANAN EFFLORESCENCE</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tahan-eff')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'tahan-air': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KETAHANAN TERHADAP AIR</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tahan-air')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'tahan-gosok': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KETAHANAN GOSOKAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tahan-gosok')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'pot-life': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">POT LIFE</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('pot-life')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input jam..." type="text"/></div></div>`,
+  'daya-sebar-10': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">DAYA SEBAR BATA RINGAN 10CM</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('daya-sebar-10')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="m²/kg" type="text"/></div></div>`,
+  'daya-sebar-7.5': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">DAYA SEBAR BATA RINGAN 7.5CM</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('daya-sebar-7.5')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="m²/kg" type="text"/></div></div>`,
+  'berat-jenis': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">BERAT JENIS</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('berat-jenis')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="ASTM D1475"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div>`,
+  'tebal-aplikasi': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">TEBAL APLIKASI</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tebal-aplikasi')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input mm..." type="text"/></div></div>`,
+  'kering-sempurna': `<div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KERING SEMPURNA</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kering-sempurna')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input jam..." type="text"/></div></div>`,
+};
+
+function removeSpecCard(specId) {
+  const card = document.querySelector(`.spec-card[data-spec="${specId}"]`);
+  if (card) card.remove();
+  const checkbox = document.querySelector(`.spec-toggle[data-spec="${specId}"]`);
+  if (checkbox) checkbox.checked = false;
+}
+
+function toggleSpecCard(specId, isChecked) {
+  const container = document.getElementById('spec-cards-container');
+  const existingCard = container.querySelector(`.spec-card[data-spec="${specId}"]`);
+
+  if (!isChecked && existingCard) {
+    // Uncheck: remove the card
+    existingCard.remove();
+  } else if (isChecked && !existingCard) {
+    // Check: restore the card
+    const template = SPEC_CARD_TEMPLATES[specId];
+    if (template) {
+      const newCard = document.createElement('div');
+      newCard.className = 'rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full';
+      newCard.setAttribute('data-spec', specId);
+      newCard.innerHTML = template;
+      container.appendChild(newCard);
+    }
+  }
+}
+</script><script>
+    function renumberStorageRows() {
+      const rows = document.querySelectorAll('#storage-table-body tr');
+      rows.forEach((row, index) => {
+        const noCell = row.querySelector('.row-no');
+        if (noCell) noCell.textContent = index + 1;
+      });
+    }
+
+    function removeStorageRow(btn) {
+      const row = btn.closest('tr');
+      row.remove();
+      renumberStorageRows();
+    }
+
+    function addStorageRow() {
+      const tbody = document.getElementById('storage-table-body');
+      const rowCount = tbody.querySelectorAll('tr').length;
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td class="px-6 py-4 row-no">${rowCount + 1}</td>
+        <td class="px-6 py-4">
+          <input class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" type="text" placeholder="Masukkan instruksi penyimpanan..."/>
+        </td>
+        <td class="px-6 py-4 text-center">
+          <button class="text-red-500 hover:text-red-700" onclick="removeStorageRow(this)">
+            <span class="material-symbols-outlined text-lg">delete</span>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(newRow);
+    }
+  </script><script>
+    function renumberMainSteps() {
+      const steps = document.querySelectorAll('#main-steps-container > .relative');
+      steps.forEach((step, index) => {
+        const badge = step.querySelector('.step-badge');
+        if (badge) badge.textContent = index + 1;
+      });
+    }
+
+    function removeMainStep(btn) {
+      btn.closest('.relative').remove();
+      renumberMainSteps();
+    }
+
+    function addMainStep() {
+      const container = document.getElementById('main-steps-container');
+      const newStep = document.createElement('div');
+      newStep.className = 'relative pl-12';
+      newStep.innerHTML = `
+        <div class="absolute left-0 top-0 w-8 h-8 bg-avian-primary text-white text-sm font-bold rounded-full flex items-center justify-center shadow-sm step-badge"></div>
+        <div class="flex items-center gap-3 group mb-4">
+          <input class="flex-1 border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary text-base font-bold p-0 bg-transparent" type="text" placeholder="Nama Langkah Baru"/>
+          <button class="text-red-400 transition-opacity" onclick="removeMainStep(this)"><span class="material-symbols-outlined text-lg text-gray-400 hover:text-red-500 transition-colors">delete</span></button>
+        </div>
+        <div class="ml-2 border border-gray-200 rounded-xl p-5 bg-white space-y-4 shadow-sm">
+          <ul class="space-y-3"></ul>
+          <button class="text-[10px] font-bold text-avian-primary hover:underline flex items-center gap-1 add-subpoint-btn" onclick="addSubPoint(this)">
+            <span class="material-symbols-outlined text-xs">add_circle</span> Tambah Sub-poin
+          </button>
+        </div>
+      `;
+      container.appendChild(newStep);
+      renumberMainSteps();
+    }
+
+    function removeSubPoint(btn) {
+      btn.closest('li').remove();
+    }
+
+    function addSubPoint(btn) {
+      const container = btn.parentElement;
+      // Show type picker if not already shown
+      if (container.querySelector('.subpoint-type-picker')) return;
+      const picker = document.createElement('div');
+      picker.className = 'subpoint-type-picker flex flex-wrap gap-2 mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200';
+      picker.innerHTML = `
+        <span class="text-[10px] font-bold text-gray-500 w-full mb-1">Pilih tipe sub-poin:</span>
+        <button onclick="insertSubPoint(this,'bullet')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:border-avian-primary hover:text-avian-primary text-[10px] font-semibold transition-colors">
+          <span class="w-1.5 h-1.5 rounded-full bg-current inline-block"></span> Bullet Points
+        </button>
+        <button onclick="insertSubPoint(this,'numbering')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:border-avian-primary hover:text-avian-primary text-[10px] font-semibold transition-colors">
+          <span class="material-symbols-outlined text-xs">format_list_numbered</span> Numbering
+        </button>
+        <button onclick="insertSubPoint(this,'alat')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:border-avian-primary hover:text-avian-primary text-[10px] font-semibold transition-colors">
+          <span class="material-symbols-outlined text-xs">brush</span> Alat Cat
+        </button>
+        <button onclick="insertSubPoint(this,'perbandingan')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:border-avian-primary hover:text-avian-primary text-[10px] font-semibold transition-colors">
+          <span class="material-symbols-outlined text-xs">compare_arrows</span> Perbandingan Air
+        </button>
+        <button onclick="this.closest('.subpoint-type-picker').remove()" class="ml-auto text-gray-400 hover:text-red-400 text-[10px]">Batal</button>
+      `;
+      container.insertBefore(picker, btn);
+    }
+
+    function getProductName() {
+      // Try to get product name from the product input/select
+      const productInput = document.querySelector('#product-selection-container input[type="text"]');
+      if (productInput && productInput.value.trim()) return productInput.value.trim();
+      const productSelect = document.querySelector('#product-selection-container select');
+      if (productSelect && productSelect.value) return productSelect.value;
+      return 'Produk';
+    }
+
+    function makeHalfStepNumeric(labelText, unitLabel) {
+      // Returns HTML for a numeric input that steps by 0.5 starting at 0.5, with a label below
+      return `
+        <div class="flex flex-col items-center gap-1">
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="stepHalfNumeric(this,-1)" class="w-5 h-5 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-bold flex items-center justify-center flex-shrink-0">−</button>
+            <input type="number" min="0.5" step="0.5" value="1" class="w-14 text-center border border-gray-300 rounded text-[11px] p-1 focus:ring-1 focus:ring-avian-primary" onchange="enforceHalfStep(this)" oninput="enforceHalfStep(this)"/>
+            <button type="button" onclick="stepHalfNumeric(this,1)" class="w-5 h-5 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-bold flex items-center justify-center flex-shrink-0">+</button>
+          </div>
+          <span class="text-[9px] font-bold text-avian-primary uppercase tracking-wide">${unitLabel}</span>
+        </div>
+      `;
+    }
+
+    function stepHalfNumeric(btn, dir) {
+      const input = btn.parentElement.querySelector('input[type="number"]');
+      let val = parseFloat(input.value) || 0.5;
+      val = Math.round(val * 2) / 2; // snap to nearest 0.5
+      val += dir * 0.5;
+      if (val < 0.5) val = 0.5;
+      input.value = val;
+    }
+
+    function enforceHalfStep(input) {
+      let val = parseFloat(input.value);
+      if (isNaN(val) || val < 0.5) { input.value = 0.5; return; }
+      // Round to nearest 0.5
+      input.value = Math.round(val * 2) / 2;
+    }
+
+    function insertSubPoint(btn, type) {
+      const picker = btn.closest('.subpoint-type-picker');
+      const container = picker.parentElement;
+      const list = container.querySelector('ul');
+      picker.remove();
+
+      if (type === 'alat') {
+        // Insert 3 separate li items for Kuas/Roll, Spray, Airless Spray
+        const alatTypes = [
+          { label: 'Kuas/Roll', icon: 'brush' },
+          { label: 'Spray', icon: 'air' },
+          { label: 'Airless Spray', icon: 'water_pump' }
+        ];
+        alatTypes.forEach(function(alat) {
+          const newItem = document.createElement('li');
+          newItem.className = 'flex items-start gap-3 group';
+          newItem.innerHTML = `
+            <span class="material-symbols-outlined text-avian-primary text-base mt-6 flex-shrink-0">brush</span>
+            <div class="flex-1 space-y-2">
+              <p class="text-[10px] font-bold text-avian-primary uppercase tracking-wide">${alat.label}</p>
+              <input class="w-full border-0 border-b border-gray-200 focus:ring-0 text-sm text-gray-700 bg-transparent p-0" type="text" placeholder="Nama alat..."/>
+              <input class="w-full border-0 border-b border-gray-200 focus:ring-0 text-sm text-gray-500 bg-transparent p-0" type="text" placeholder="Keterangan alat..."/>
+            </div>
+            <button class="text-gray-400 flex-shrink-0 mt-6" onclick="removeSubPoint(this)"><span class="material-symbols-outlined text-base text-gray-400 hover:text-red-500">delete</span></button>
+          `;
+          list.appendChild(newItem);
+        });
+        return;
+      }
+
+      if (type === 'perbandingan') {
+        // Insert 3 separate li items: a. Perbandingan Volume, b. Perbandingan Berat, c. Atau
+        const produkName = getProductName();
+        const perbandinganTypes = [
+          { label: 'A. Perbandingan Volume', sub: 'a' },
+          { label: 'B. Perbandingan Berat', sub: 'b' },
+          { label: 'C. Atau', sub: 'c' }
+        ];
+        perbandinganTypes.forEach(function(pb) {
+          const newItem = document.createElement('li');
+          newItem.className = 'flex items-start gap-3 group';
+          newItem.innerHTML = `
+            <span class="material-symbols-outlined text-avian-primary text-base mt-6 flex-shrink-0">compare_arrows</span>
+            <div class="flex-1 space-y-2">
+              <p class="text-[10px] font-bold text-avian-primary uppercase tracking-wide">${pb.label}</p>
+              <div class="flex items-center gap-3">
+                <div class="flex-1 space-y-1 text-center">
+                  <label class="text-[9px] font-bold text-gray-400 uppercase block">Kiri</label>
+                  ${makeHalfStepNumeric('', 'Liter')}
+                </div>
+                <span class="text-gray-400 font-bold text-sm flex-shrink-0 mt-2">:</span>
+                <div class="flex-1 space-y-1 text-center">
+                  <label class="text-[9px] font-bold text-gray-400 uppercase block">Kanan</label>
+                  ${makeHalfStepNumeric('', produkName)}
+                </div>
+              </div>
+            </div>
+            <button class="text-gray-400 flex-shrink-0 mt-6" onclick="removeSubPoint(this)"><span class="material-symbols-outlined text-base text-gray-400 hover:text-red-500">delete</span></button>
+          `;
+          list.appendChild(newItem);
+        });
+        return;
+      }
+
+      const newItem = document.createElement('li');
+      newItem.className = 'flex items-start gap-3 group';
+
+      if (type === 'bullet') {
+        newItem.innerHTML = `
+          <span class="w-1.5 h-1.5 rounded-full bg-avian-primary mt-2 flex-shrink-0"></span>
+          <input class="flex-1 border-0 p-0 text-sm text-gray-700 focus:ring-0" type="text" placeholder="Masukkan sub-poin..."/>
+          <button class="text-gray-400" onclick="removeSubPoint(this)"><span class="material-symbols-outlined text-base text-gray-400 hover:text-red-500">delete</span></button>
+        `;
+      } else if (type === 'numbering') {
+        const idx = list.querySelectorAll('li').length + 1;
+        newItem.innerHTML = `
+          <span class="flex-shrink-0 w-5 h-5 rounded-full bg-avian-primary text-white text-[10px] font-bold flex items-center justify-center mt-1 subpoint-num">${idx}</span>
+          <div class="flex-1 space-y-2">
+            <input class="w-full border-0 border-b border-gray-200 focus:ring-0 text-sm text-gray-700 bg-transparent p-0" type="text" placeholder="Baris atas..."/>
+            <input class="w-full border-0 border-b border-gray-200 focus:ring-0 text-sm text-gray-700 bg-transparent p-0" type="text" placeholder="Baris bawah..."/>
+          </div>
+          <button class="text-gray-400 flex-shrink-0" onclick="removeSubPoint(this)"><span class="material-symbols-outlined text-base text-gray-400 hover:text-red-500">delete</span></button>
+        `;
+      }
+
+      list.appendChild(newItem);
+    }
+  </script></head>
+<body class="bg-avian-bg font-sans text-gray-800">
+<div class="flex min-h-screen">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-avian-sidebar text-gray-300 flex-shrink-0 flex flex-col"><div class="p-4 flex items-center gap-3 border-b border-gray-700">
+<div class="bg-white p-1 rounded">
+<div class="w-8 h-8 bg-avian-primary rounded-sm"></div>
+</div>
+<span class="font-bold text-white tracking-wider">AVIAN TDS</span>
+</div>
+<nav class="flex-1 mt-4">
+<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Main</div>
+<a class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Dashboard</a>
+<a id="nav-product-master" class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer" onclick="navigateTo('product-master')">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Product Master</a>
+<a id="nav-list-tds" class="flex items-center px-6 py-3 sidebar-item-active cursor-pointer" onclick="navigateTo('list-tds')">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>List TDS</a>
+<div class="px-4 py-2 mt-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Master</div>
+<a class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Asset Library</a>
+<a class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>User Management</a>
+<a class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors" href="#">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Settings</a>
+</nav>
+<div class="p-4 border-t border-gray-700 text-[10px] text-gray-500">© 2023 Avian Brands. All rights reserved.</div></aside>
+<!-- END: Sidebar -->
+<main class="flex-1 flex flex-col overflow-hidden min-w-0">
+<!-- BEGIN: Navbar -->
+<header class="h-16 bg-avian-primary flex items-center justify-between px-8 text-white shadow-md sticky top-0 z-50" style="min-width:0;width:100%;"><div class="flex items-center gap-4">
+<button class="p-2 hover:bg-avian-dark rounded-md transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<h1 class="text-xl font-bold">Avian TDS System</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 bg-red-600 text-[10px] text-white rounded-full w-4 h-4 flex items-center justify-center">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold leading-tight">ALBERT SENOADJI JR</p>
+<p class="text-[10px] opacity-75">IT40 (01225081)</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-white border-2 border-avian-light flex items-center justify-center overflow-hidden">
+<svg class="w-6 h-6 text-avian-primary" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div></header>
+<!-- END: Navbar -->
+
+<!-- ==================== LIST VIEW ==================== -->
+
+<style>
+/* ===== SHARED PAGE STYLES ===== */
+.page-view { display: none; flex: 1; overflow-y: auto; }
+.page-view.active { display: block; }
+
+/* DataTable-style wrapper */
+.dt-wrapper { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; width: 100%; min-width: 0; }
+.dt-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #e5e7eb; gap: 8px; }
+.dt-topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #374151; }
+.dt-topbar-right { display: flex; align-items: center; gap-6px; gap: 6px; }
+.dt-show-select { border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; padding: 2px 6px; }
+.dt-search-input { border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; padding: 4px 10px; outline: none; width: 150px; }
+.dt-search-input:focus { border-color: #006442; }
+.dt-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; border: 1px solid #d1d5db; background: #fff; cursor: pointer; color: #374151; transition: background 0.12s; }
+.dt-btn:hover { background: #f3f4f6; }
+.dt-btn-primary { background: #006442; color: #fff; border-color: #006442; }
+.dt-btn-primary:hover { background: #004d32; }
+
+/* table */
+.dt-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.dt-table thead th { background: #f9fafb; color: #6b7280; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 14px; border-bottom: 2px solid #e5e7eb; text-align: left; white-space: nowrap; cursor: pointer; user-select: none; }
+.dt-table thead th:hover { background: #f0fdf4; color: #006442; }
+.dt-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+.dt-table tbody tr:hover { background: #f9fafb; }
+.dt-table tbody td { padding: 10px 14px; vertical-align: middle; color: #111827; }
+.dt-empty td { text-align: center; padding: 40px; color: #9ca3af; font-size: 13px; }
+
+.dt-action-btn { width: 30px; height: 30px; border-radius: 5px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; transition: opacity 0.12s; }
+.dt-action-btn:hover { opacity: 0.8; }
+.btn-blue   { background: #2563eb; color: #fff; }
+.btn-red    { background: #ef4444; color: #fff; }
+.btn-green  { background: #16a34a; color: #fff; }
+.btn-yellow { background: #d97706; color: #fff; }
+
+.pdf-badge { display: inline-flex; align-items: center; justify-content: center; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; margin-right: 3px; }
+.pdf-id  { background: #2563eb; color: #fff; }
+.pdf-eng { background: #d97706; color: #fff; }
+
+.approve-cell { min-width: 130px; }
+.approve-btn { padding: 4px 14px; background: #16a34a; color: #fff; border: none; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.12s; }
+.approve-btn:hover { background: #15803d; }
+.approved-info { font-size: 10px; color: #16a34a; font-weight: 700; line-height: 1.4; }
+.approved-check { color: #16a34a; font-size: 14px; }
+
+.no-form-text { font-size: 12px; color: #374151; font-weight: 600; }
+.last-edit-name { font-size: 12px; font-weight: 700; color: #16a34a; }
+.last-edit-date { font-size: 11px; color: #6b7280; }
+
+/* filter panel */
+.dt-filter-panel { display: none; background: #f8faf9; border-bottom: 1px solid #e5e7eb; padding: 14px 16px; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.dt-filter-panel.open { display: flex; }
+.dt-filter-field { display: flex; flex-direction: column; gap: 3px; min-width: 140px; }
+.dt-filter-label { font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+.dt-filter-select, .dt-filter-input { border: 1px solid #d1d5db; border-radius: 5px; font-size: 12px; padding: 5px 8px; outline: none; }
+.dt-filter-select:focus, .dt-filter-input:focus { border-color: #006442; }
+.dt-reset-btn { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: #006442; color: #fff; border: none; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.dt-reset-btn:hover { background: #004d32; }
+
+/* pagination */
+.dt-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid #f3f4f6; font-size: 12px; color: #6b7280; }
+.dt-pagination { display: flex; gap: 4px; }
+.dt-page-btn { width: 28px; height: 28px; border-radius: 5px; border: 1px solid #e5e7eb; background: #fff; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.dt-page-btn:hover { background: #f0fdf4; border-color: #006442; }
+.dt-page-btn.active { background: #006442; color: #fff; border-color: #006442; }
+
+/* modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: #fff; border-radius: 12px; padding: 28px 32px; max-width: 420px; width: 90%; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+.modal-title { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+.modal-desc { font-size: 13px; color: #6b7280; margin-bottom: 22px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-cancel { padding: 8px 18px; border: 1.5px solid #d1d5db; border-radius: 7px; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.modal-cancel:hover { background: #f3f4f6; }
+.modal-confirm-del { padding: 8px 18px; border: none; border-radius: 7px; background: #ef4444; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.modal-confirm-del:hover { background: #dc2626; }
+
+/* Product Master form slide */
+.pm-form-view { display: none; }
+.pm-form-view.active { display: block; }
+
+/* form fields */
+.form-label { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
+.form-input { width: 100%; border: 1.5px solid #d1d5db; border-radius: 7px; padding: 8px 12px; font-size: 13px; outline: none; }
+.form-input:focus { border-color: #006442; }
+.form-textarea { width: 100%; border: 1.5px solid #d1d5db; border-radius: 7px; padding: 8px 12px; font-size: 13px; outline: none; resize: vertical; min-height: 80px; }
+.form-textarea:focus { border-color: #006442; }
+.form-select { width: 100%; border: 1.5px solid #d1d5db; border-radius: 7px; padding: 8px 12px; font-size: 13px; outline: none; background: #fff; }
+.form-select:focus { border-color: #006442; }
+</style>
+
+<!-- ==================== LIST TDS VIEW ==================== -->
+<div id="list-tds-view" class="page-view active" style="padding: 20px 24px; overflow-x: hidden; min-width: 0;">
+
+  <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:20px;">List TDS</h2>
+
+  <div class="dt-wrapper">
+    <!-- topbar -->
+    <div class="dt-topbar">
+      <span style="font-size:13px;font-weight:700;color:#374151;">List TDS</span>
+      <div class="dt-topbar-right">
+        <button class="dt-btn" onclick="toggleTdsFilter()">
+          <span class="material-symbols-outlined" style="font-size:15px;">filter_list</span> Filter
+        </button>
+        <button class="dt-btn" onclick="reloadTdsTable()">
+          <span class="material-symbols-outlined" style="font-size:15px;">refresh</span> Reload
+        </button>
+        <button class="dt-btn dt-btn-primary" onclick="openTdsForm('new')">
+          <span class="material-symbols-outlined" style="font-size:15px;">add</span> Add
+        </button>
+      </div>
+    </div>
+
+    <!-- filter panel -->
+    <div class="dt-filter-panel" id="tds-filter-panel">
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Nama Produk</label>
+        <input class="dt-filter-input" id="tf-nama" type="text" placeholder="Cari..." oninput="applyTdsFilters()"/>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Kategori</label>
+        <select class="dt-filter-select" id="tf-kategori" onchange="applyTdsFilters()">
+          <option value="">Semua</option>
+          <option>Solvent Based</option>
+          <option>Construction</option>
+          <option>Waterproofing</option>
+          <option>Water Based</option>
+        </select>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Versi</label>
+        <select class="dt-filter-select" id="tf-versi" onchange="applyTdsFilters()">
+          <option value="">Semua</option>
+          <option>1</option><option>2</option><option>3</option>
+        </select>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Last Edit (Dari)</label>
+        <input class="dt-filter-input" id="tf-date-from" type="date" onchange="applyTdsFilters()"/>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Last Edit (Sampai)</label>
+        <input class="dt-filter-input" id="tf-date-to" type="date" onchange="applyTdsFilters()"/>
+      </div>
+      <button class="dt-reset-btn" onclick="resetTdsFilters()">
+        <span class="material-symbols-outlined" style="font-size:14px;">refresh</span> Reset
+      </button>
+    </div>
+
+    <!-- show entries + search -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;gap:8px;">
+      <div class="dt-topbar-left">
+        Show <select class="dt-show-select" id="tds-show-count" onchange="applyTdsFilters()">
+          <option>10</option><option>25</option><option>50</option>
+        </select> entries
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;">
+        Search: <input class="dt-search-input" id="tds-search" type="text" oninput="applyTdsFilters()"/>
+      </div>
+    </div>
+
+    <!-- table -->
+    <div style="overflow-x:auto; width:100%; -webkit-overflow-scrolling:touch;">
+      <table class="dt-table" id="tds-main-table">
+        <thead>
+          <tr>
+            <th style="width:44px;"></th>
+            <th onclick="sortTds('tanggal')">Tanggal ↕</th>
+            <th onclick="sortTds('noForm')">No Form ↕</th>
+            <th onclick="sortTds('nama')">Nama Produk ↕</th>
+            <th>Versi</th>
+            <th>PDF</th>
+            <th onclick="sortTds('lastEdit')">Last Edit ↕</th>
+            <th>Approval RDI</th>
+            <th>Approval RDI Director</th>
+            <th>Approval Marketing Manager</th>
+            <th>Approval Marketing Director</th>
+          </tr>
+        </thead>
+        <tbody id="tds-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- footer pagination -->
+    <div class="dt-footer">
+      <span id="tds-info-label">Showing 0 to 0 of 0 entries</span>
+      <div class="dt-pagination" id="tds-pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PRODUCT MASTER LIST VIEW ==================== -->
+<div id="product-master-view" class="page-view" style="padding: 20px 24px; overflow-x: hidden; min-width: 0;">
+
+  <!-- List table (default shown) -->
+  <div id="pm-list-section">
+    <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:20px;">Product Master</h2>
+
+    <div class="dt-wrapper">
+      <div class="dt-topbar">
+        <span style="font-size:13px;font-weight:700;color:#374151;">List Product Master</span>
+        <div class="dt-topbar-right">
+          <button class="dt-btn" onclick="togglePmFilter()">
+            <span class="material-symbols-outlined" style="font-size:15px;">filter_list</span> Filter
+          </button>
+          <button class="dt-btn" onclick="renderPmTable()">
+            <span class="material-symbols-outlined" style="font-size:15px;">refresh</span> Reload
+          </button>
+        </div>
+      </div>
+
+      <!-- filter -->
+      <div class="dt-filter-panel" id="pm-filter-panel">
+        <div class="dt-filter-field">
+          <label class="dt-filter-label">Nama Produk</label>
+          <input class="dt-filter-input" id="pmf-nama" type="text" placeholder="Cari..." oninput="applyPmFilters()"/>
+        </div>
+        <div class="dt-filter-field">
+          <label class="dt-filter-label">Kategori</label>
+          <select class="dt-filter-select" id="pmf-kategori" onchange="applyPmFilters()">
+            <option value="">Semua</option>
+            <option>Solvent Based</option>
+            <option>Construction</option>
+            <option>Waterproofing</option>
+            <option>Water Based</option>
+          </select>
+        </div>
+        <button class="dt-reset-btn" onclick="resetPmFilters()">
+          <span class="material-symbols-outlined" style="font-size:14px;">refresh</span> Reset
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #f3f4f6;gap:8px;">
+        <div class="dt-topbar-left">
+          Show <select class="dt-show-select" id="pm-show-count" onchange="applyPmFilters()">
+            <option>10</option><option>25</option><option>50</option>
+          </select> entries
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;flex-shrink:0;">
+          Search: <input class="dt-search-input" id="pm-search" type="text" oninput="applyPmFilters()"/>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto; width:100%; -webkit-overflow-scrolling:touch;">
+        <table class="dt-table" id="pm-main-table">
+          <thead>
+            <tr>
+              <th style="width:90px;">Aksi</th>
+              <th onclick="sortPm('nama')">Nama Produk ↕</th>
+              <th onclick="sortPm('kategori')">Kategori ↕</th>
+              <th>Deskripsi Produk</th>
+            </tr>
+          </thead>
+          <tbody id="pm-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="dt-footer">
+        <span id="pm-info-label">Showing 0 to 0 of 0 entries</span>
+        <div class="dt-pagination" id="pm-pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pm-view-section" style="display:none; max-width: 900px; margin: 0 auto;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <button onclick="closePmView()" class="dt-btn">
+        <span class="material-symbols-outlined" style="font-size:15px;">arrow_back</span> Kembali
+      </button>
+      <h2 style="font-size:20px;font-weight:800;color:#111827;">Detail Product Master</h2>
+    </div>
+
+    <!-- Header Card (Name, Image, Category, Description) -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" style="display: flex; flex-direction: row; gap: 24px; align-items: flex-start; background: #fff;">
+      <div id="pm-view-gambar-container" style="width: 120px; height: 120px; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f9fafb; flex-shrink: 0;">
+        <!-- Image goes here -->
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <span id="pm-view-kategori" class="text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded" style="font-size: 10px; display: inline-block;">Kategori</span>
+          <h3 id="pm-view-nama" style="font-size: 20px; font-weight: 800; color: #111827; margin-top: 6px;">Product Name</h3>
+        </div>
+        <div>
+          <h4 style="font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Deskripsi Produk</h4>
+          <p id="pm-view-deskripsi" style="font-size: 13px; color: #4b5563; line-height: 1.6; margin-top: 4px;">Description goes here...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TDS History Table -->
+    <div class="dt-wrapper">
+      <div class="dt-topbar">
+        <span style="font-size:13px;font-weight:700;color:#374151;">Riwayat Dokumen TDS</span>
+      </div>
+      <div style="overflow-x:auto; width:100%;">
+        <table class="dt-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Versi</th>
+              <th>Link TDS / PDF</th>
+            </tr>
+          </thead>
+          <tbody id="pm-view-history-tbody">
+            <!-- Versions dynamic -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit form -->
+  <div id="pm-edit-section" style="display:none; max-width: 900px; margin: 0 auto;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <button onclick="closePmEdit()" class="dt-btn">
+        <span class="material-symbols-outlined" style="font-size:15px;">arrow_back</span> Kembali
+      </button>
+      <h2 style="font-size:20px;font-weight:800;color:#111827;">Edit Product Master</h2>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" style="background: #fff;">
+      <div style="display: flex; flex-direction: row; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+        <!-- Left: Image upload and preview -->
+        <div style="width: 140px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span class="form-label" style="text-align: center; width: 100%;">Gambar Produk</span>
+          <div id="pm-edit-gambar-preview" style="width: 120px; height: 120px; border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f9fafb;">
+            <!-- Preview image -->
+          </div>
+          <input type="file" accept="image/*" id="pm-edit-gambar" style="display: none;" onchange="previewPmEditImage(this)"/>
+          <button type="button" class="dt-btn" onclick="document.getElementById('pm-edit-gambar').click()" style="font-size: 11px; padding: 4px 8px; width: 100%; justify-content: center;">Pilih Gambar</button>
+        </div>
+
+        <!-- Right: Inputs -->
+        <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 180px;">
+              <label class="form-label">Nama Produk <span style="color:#ef4444;">*</span></label>
+              <input class="form-input" id="pm-edit-nama" type="text" placeholder="Nama produk..."/>
+            </div>
+            <div style="flex: 1; min-width: 180px;">
+              <label class="form-label">Kategori <span style="color:#ef4444;">*</span></label>
+              <select class="form-select" id="pm-edit-kategori">
+                <option value="">-- Pilih Kategori --</option>
+                <option>Solvent Based</option>
+                <option>Construction</option>
+                <option>Waterproofing</option>
+                <option>Water Based</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Deskripsi Produk</label>
+            <textarea class="form-textarea" id="pm-edit-deskripsi" placeholder="Deskripsi singkat produk..." style="min-height: 70px;"></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid #f3f4f6;margin-top:20px;">
+        <button class="dt-btn" onclick="closePmEdit()">Batal</button>
+        <button class="dt-btn dt-btn-primary" onclick="savePmEdit()">Simpan</button>
+      </div>
+    </div>
+
+    <!-- TDS History Table -->
+    <div class="dt-wrapper">
+      <div class="dt-topbar">
+        <span style="font-size:13px;font-weight:700;color:#374151;">Riwayat Dokumen TDS</span>
+      </div>
+      <div style="overflow-x:auto; width:100%;">
+        <table class="dt-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Versi</th>
+              <th>Link TDS / PDF</th>
+            </tr>
+          </thead>
+          <tbody id="pm-edit-history-tbody">
+            <!-- Versions dynamic -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- delete modal (shared) -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box">
+    <div class="modal-title">Hapus data?</div>
+    <div class="modal-desc" id="delete-modal-desc">Data ini akan dihapus permanen.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeDeleteModal()">Batal</button>
+      <button class="modal-confirm-del" onclick="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// LOGGED IN USER (hardcoded)
+// ================================================================
+const LOGGED_IN_USER = 'DINDA VINDARINA PRIMALASITA';
+
+// ================================================================
+// DATA
+// ================================================================
+let tdsData = [
+  { id:1, tanggal:'15/05/2026', noForm:'',              nama:'Avian Dempul',          kategori:'Solvent Based',  versi:1, pdf:['ID'],      lastEditName:'DINDA VINDARINA PRIMALASITA', lastEditDate:'15 Mei 2026',    approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:2, tanggal:'07/05/2026', noForm:'TDS0001/1',     nama:'Sunguard',               kategori:'Water Based',    versi:1, pdf:['ID'],      lastEditName:'DINDA VINDARINA PRIMALASITA', lastEditDate:'7 Mei 2026',     approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:3, tanggal:'04/05/2026', noForm:'TDS01303/16',   nama:'Sunguard Cat Tembok',    kategori:'Water Based',    versi:1, pdf:['ID'],      lastEditName:'MUHAMMAD IBRAHIM ALIANSYAH',  lastEditDate:'6 Mei 2026',     approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:4, tanggal:'15/01/2025', noForm:'TDS/RDR/SB/0125',nama:'No Lumut Solvent Based',kategori:'Solvent Based',  versi:1, pdf:[],         lastEditName:'NUR CAHYONO SANTOSO',         lastEditDate:'15 Januari 2025', approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:5, tanggal:'18/07/2024', noForm:'TDS/NL/0124',   nama:'No Lumut Solvent Based', kategori:'Solvent Based',  versi:2, pdf:['ID','ENG'],lastEditName:'INDRANILA',                  lastEditDate:'18 Juli 2024',   approvals:{rdi:{name:'DINDA VINDARINA PRIMALASITA',date:'11 Februari 2026'},rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:6, tanggal:'11/01/2024', noForm:'TDS/RDR/SB/0124',nama:'Avian Cat Kayu',             kategori:'Solvent Based',  versi:1, pdf:[],         lastEditName:'EGIP INDRAYANTO',             lastEditDate:'11 Januari 2024', approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:7, tanggal:'15/12/2023', noForm:'TDS/RDR/WB/0123',nama:'Avian Cat Tembok Interior',   kategori:'Water Based',    versi:1, pdf:[],         lastEditName:'EVA PUSPITA INDRIYANI',       lastEditDate:'15 Mei 2024',    approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:8, tanggal:'01/12/2023', noForm:'TDS/LL/3123',   nama:'Avian Cat Kayu dan Besi',     kategori:'Solvent Based',  versi:1, pdf:[],         lastEditName:'FIKRI YATHIR',               lastEditDate:'1 Desember 2023', approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:9, tanggal:'21/11/2023', noForm:'TDS/LL/3023',   nama:'Aries Gold',                  kategori:'Water Based',    versi:1, pdf:[],         lastEditName:'FIKRI YATHIR',               lastEditDate:'21 November 2023',approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:10, tanggal:'10/03/2026', noForm:'TDS/ND/0326',   nama:'No Drop Anti Panas',     kategori:'Waterproofing',  versi:3, pdf:['ID','ENG'],lastEditName:'DINDA VINDARINA PRIMALASITA', lastEditDate:'10 Maret 2026',   approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:11, tanggal:'15/06/2025', noForm:'TDS/ND/0625',   nama:'No Drop Anti Panas',     kategori:'Waterproofing',  versi:2, pdf:['ID'],      lastEditName:'MUHAMMAD IBRAHIM ALIANSYAH',  lastEditDate:'15 Juni 2025',   approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:12, tanggal:'12/02/2024', noForm:'TDS/ND/0224',   nama:'No Drop Anti Panas',     kategori:'Waterproofing',  versi:1, pdf:['ID'],      lastEditName:'NUR CAHYONO SANTOSO',         lastEditDate:'12 Februari 2024', approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+];
+let nextTdsId = 13;
+
+// Product Master data (auto-synced from tdsData)
+let pmData = [];
+
+function syncPmFromTds() {
+  // Add new entries from tdsData that aren't already in pmData by name
+  tdsData.forEach(tds => {
+    const exists = pmData.find(p => p.nama.toLowerCase() === tds.nama.toLowerCase());
+    if (!exists) {
+      const getAbbreviation = (name) => name.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase();
+      pmData.push({
+        id: tds.id,
+        nama: tds.nama,
+        kategori: tds.kategori,
+        versi: tds.versi,
+        deskripsi: `Cat premium berkualitas tinggi dari Avian Brands untuk kategori ${tds.kategori}. Memberikan perlindungan jangka panjang dan hasil akhir yang sempurna.`,
+        gambar: `https://placehold.co/60x60/006442/white?text=${getAbbreviation(tds.nama)}`,
+        linkTds: '#'
+      });
+    } else {
+      if (tds.versi > exists.versi) {
+        exists.versi = tds.versi;
+      }
+    }
+  });
+}
+
+// Initial fully-populated mock entries for all products
+pmData = [
+  { id:1,   nama:'Avian Dempul',            kategori:'Solvent Based',  versi:1, deskripsi:'Dempul berbasis solvent premium untuk meratakan permukaan kayu dan besi. Mudah diaplikasikan dan diamplas.',            gambar:'https://placehold.co/60x60/006442/white?text=AD',   linkTds:'#' },
+  { id:2,   nama:'Sunguard',                kategori:'Water Based',    versi:1, deskripsi:'Cat tembok eksterior berbasis air dengan ketahanan cuaca tinggi. Mengandung UV Shield untuk perlindungan maksimal.',   gambar:'https://placehold.co/60x60/2563eb/white?text=SG',   linkTds:'#' },
+  { id:3,   nama:'Sunguard Cat Tembok',     kategori:'Water Based',    versi:1, deskripsi:'Varian cat tembok Sunguard dengan formula khusus anti jamur dan lumut. Cocok untuk eksterior tropis.',                  gambar:'https://placehold.co/60x60/16a34a/white?text=SCT',  linkTds:'#' },
+  { id:5,   nama:'No Lumut Solvent Based',  kategori:'Solvent Based',  versi:2, deskripsi:'Versi terbaru No Lumut Solvent Based dengan formula yang disempurnakan dan daya rekat lebih kuat pada permukaan lembab. Mengandung biocide aktif mencegah lumut.', gambar:'https://placehold.co/60x60/d97706/white?text=NL',   linkTds:'#' },
+  { id:6,   nama:'Avian Cat Kayu',               kategori:'Solvent Based',  versi:1, deskripsi:'Cat kayu berbasis solvent premium dengan pigmentasi khusus untuk hasil akhir yang halus, kilap, dan tahan lama pada permukaan kayu.',    gambar:'https://placehold.co/60x60/7c3aed/white?text=ACK',   linkTds:'#' },
+  { id:7,   nama:'Avian Cat Tembok Interior',    kategori:'Water Based',    versi:1, deskripsi:'Cat tembok interior premium berbasis air yang memberikan permukaan dinding yang halus, mudah dibersihkan, dan tahan jamur.',          gambar:'https://placehold.co/60x60/0891b2/white?text=ATI',   linkTds:'#' },
+  { id:8,   nama:'Avian Cat Kayu dan Besi',      kategori:'Solvent Based',  versi:1, deskripsi:'Cat kayu dan besi alkyd sintetik bermutu tinggi dengan hasil kilap sempurna, cepat kering, dan tahan karat.',  gambar:'https://placehold.co/60x60/dc2626/white?text=AKB',   linkTds:'#' },
+  { id:9,   nama:'Aries Gold',                   kategori:'Water Based',    versi:1, deskripsi:'Cat tembok Aries Gold adalah pilihan ekonomis berkualitas tinggi untuk dinding interior. Memberikan daya tutup yang baik dan tahan lama.',             gambar:'https://placehold.co/60x60/059669/white?text=AG',    linkTds:'#' },
+  { id:901, nama:'No Drop Anti Panas',     kategori:'Waterproofing',  versi:3, deskripsi:'Cat pelapis anti bocor yang menurunkan suhu ruangan hingga 7°C dengan teknologi UV Shield. Elastis dan tahan 10 tahun.',  gambar:'https://placehold.co/60x60/be123c/white?text=ND',   linkTds:'#' },
+];
+
+syncPmFromTds();
+
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function navigateTo(page) {
+  // hide all views
+  ['list-tds-view','product-master-view'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  // hide form view too if switching pages
+  const fv = document.getElementById('form-view');
+  if (fv) fv.style.display = 'none';
+
+  // nav active state
+  document.querySelectorAll('[id^="nav-"]').forEach(a => {
+    a.classList.remove('sidebar-item-active');
+    a.classList.add('hover:bg-gray-800');
+  });
+
+  if (page === 'list-tds') {
+    document.getElementById('list-tds-view').classList.add('active');
+    document.getElementById('nav-list-tds').classList.add('sidebar-item-active');
+    applyTdsFilters();
+  } else if (page === 'product-master') {
+    document.getElementById('product-master-view').classList.add('active');
+    document.getElementById('nav-product-master').classList.add('sidebar-item-active');
+    
+    const pmViewSec = document.getElementById('pm-view-section');
+    const pmEditSec = document.getElementById('pm-edit-section');
+    const pmListSec = document.getElementById('pm-list-section');
+    if (pmViewSec) pmViewSec.style.display = 'none';
+    if (pmEditSec) pmEditSec.style.display = 'none';
+    if (pmListSec) pmListSec.style.display = 'block';
+    
+    syncPmFromTds();
+    applyPmFilters();
+  }
+}
+
+// ================================================================
+// LIST TDS — RENDER
+// ================================================================
+let tdsFiltered = [...tdsData];
+let tdsSortKey = '';
+let tdsSortAsc = true;
+let tdsPage = 1;
+
+function getTodayStr() {
+  const d = new Date();
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function applyTdsFilters() {
+  const nama      = (document.getElementById('tf-nama')?.value || '').toLowerCase();
+  const kategori  = document.getElementById('tf-kategori')?.value || '';
+  const versi     = document.getElementById('tf-versi')?.value || '';
+  const dateFrom  = document.getElementById('tf-date-from')?.value || '';
+  const dateTo    = document.getElementById('tf-date-to')?.value || '';
+  const search    = (document.getElementById('tds-search')?.value || '').toLowerCase();
+
+  tdsFiltered = tdsData.filter(r => {
+    if (nama     && !r.nama.toLowerCase().includes(nama))     return false;
+    if (kategori && r.kategori !== kategori)                  return false;
+    if (versi    && String(r.versi) !== versi)                return false;
+    if (search   && !r.nama.toLowerCase().includes(search) && !r.noForm.toLowerCase().includes(search)) return false;
+    // date filter uses tanggal in DD/MM/YYYY
+    if (dateFrom || dateTo) {
+      const parts = r.tanggal.split('/');
+      const rowDate = parts[2] + '-' + parts[1] + '-' + parts[0];
+      if (dateFrom && rowDate < dateFrom) return false;
+      if (dateTo   && rowDate > dateTo)   return false;
+    }
+    return true;
+  });
+  tdsPage = 1;
+  renderTdsTable();
+}
+
+function sortTds(key) {
+  if (tdsSortKey === key) tdsSortAsc = !tdsSortAsc;
+  else { tdsSortKey = key; tdsSortAsc = true; }
+  tdsFiltered.sort((a,b) => {
+    let av = a[key] || '', bv = b[key] || '';
+    if (key === 'versi') { av = Number(av); bv = Number(bv); }
+    return (av < bv ? -1 : av > bv ? 1 : 0) * (tdsSortAsc ? 1 : -1);
+  });
+  renderTdsTable();
+}
+
+function renderTdsTable() {
+  const tbody = document.getElementById('tds-tbody');
+  const showN = parseInt(document.getElementById('tds-show-count')?.value || 10);
+  const start = (tdsPage - 1) * showN;
+  const pageData = tdsFiltered.slice(start, start + showN);
+  const totalPages = Math.ceil(tdsFiltered.length / showN);
+
+  if (!pageData.length) {
+    tbody.innerHTML = '<tr class="dt-empty"><td colspan="11">Tidak ada data.</td></tr>';
+  } else {
+    tbody.innerHTML = pageData.map(r => {
+      const pdfBtns = (r.pdf||[]).map(lang =>
+        `<button class="pdf-badge pdf-${lang.toLowerCase()}">${lang}</button>`).join('');
+      const approvalCell = (key, label) => {
+        const a = r.approvals[key];
+        if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
+        return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove(${r.id},'${key}')">Approve</button></td>`;
+      };
+      return `<tr>
+        <td>
+          <div style="display:flex;gap:4px;">
+            <button class="dt-action-btn btn-yellow" title="Relaunch" onclick="relaunchTds(${r.id})">
+              <span class="material-symbols-outlined" style="font-size:14px;">restart_alt</span>
+            </button>
+            <button class="dt-action-btn btn-blue" title="Edit" onclick="openTdsForm('edit',${r.id})">
+              <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
+            </button>
+            <button class="dt-action-btn btn-red" title="Hapus" onclick="openDeleteModal('tds',${r.id})">
+              <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+            </button>
+          </div>
+        </td>
+        <td style="white-space:nowrap;font-size:12px;">${r.tanggal}</td>
+        <td class="no-form-text">${r.noForm || ''}</td>
+        <td style="font-weight:600;">${r.nama}</td>
+        <td><span style="font-size:12px;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-weight:600;">${r.versi}</span></td>
+        <td>${pdfBtns || '<span style="color:#d1d5db;font-size:11px;">—</span>'}</td>
+        <td><div class="last-edit-name">${r.lastEditName}</div><div class="last-edit-date">${r.lastEditDate}</div></td>
+        ${approvalCell('rdi','rdi')}
+        ${approvalCell('rdiDir','rdiDir')}
+        ${approvalCell('mktMgr','mktMgr')}
+        ${approvalCell('mktDir','mktDir')}
+      </tr>`;
+    }).join('');
+  }
+
+  // info label
+  const from = tdsFiltered.length ? start + 1 : 0;
+  const to   = Math.min(start + showN, tdsFiltered.length);
+  document.getElementById('tds-info-label').textContent =
+    `Showing ${from} to ${to} of ${tdsFiltered.length} entries (filtered from ${tdsData.length} total)`;
+
+  // pagination
+  const pg = document.getElementById('tds-pagination');
+  pg.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const b = document.createElement('button');
+    b.className = 'dt-page-btn' + (i === tdsPage ? ' active' : '');
+    b.textContent = i;
+    b.onclick = () => { tdsPage = i; renderTdsTable(); };
+    pg.appendChild(b);
+  }
+}
+
+function doApprove(tdsId, key) {
+  const r = tdsData.find(x => x.id === tdsId);
+  if (!r) return;
+  r.approvals[key] = { name: LOGGED_IN_USER, date: getTodayStr() };
+  r.lastEditName = LOGGED_IN_USER;
+  r.lastEditDate = getTodayStr();
+  renderTdsTable();
+}
+
+function toggleTdsFilter() {
+  document.getElementById('tds-filter-panel').classList.toggle('open');
+}
+
+function resetTdsFilters() {
+  ['tf-nama','tf-kategori','tf-versi','tf-date-from','tf-date-to','tds-search'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  applyTdsFilters();
+}
+
+function reloadTdsTable() { applyTdsFilters(); }
+
+// ================================================================
+// RELAUNCH TDS — open form pre-filled, on save create new row v+1
+// ================================================================
+let relaunchSourceId = null;
+
+function relaunchTds(id) {
+  relaunchSourceId = id;
+  openTdsForm('relaunch', id);
+}
+
+// ================================================================
+// TDS FORM OPEN/CLOSE
+// ================================================================
+function setProdukType(type) {
+  const btnLama = document.getElementById('btn-produk-lama');
+  const btnBaru = document.getElementById('btn-produk-baru');
+  const container = document.getElementById('product-selection-container');
+  
+  if (type === 'lama') {
+    if (btnLama) btnLama.className = 'px-6 py-2 bg-avian-primary text-white text-sm font-semibold rounded-l border border-avian-primary';
+    if (btnBaru) btnBaru.className = 'px-6 py-2 bg-white text-gray-700 text-sm font-semibold rounded-r border border-gray-300 border-l-0 hover:bg-gray-50';
+    
+    // Get unique product names from Product Master to fill dropdown options
+    const uniqueProducts = Array.from(new Set(pmData.map(p => p.nama)));
+    const options = uniqueProducts.map(name => `<option value="${name}">${name}</option>`).join('');
+    
+    if (container) {
+      container.innerHTML = `<div>
+        <label class="block text-xs font-bold text-gray-600 mb-2">PILIH PRODUK <span class="text-red-500">*</span></label>
+        <select id="produk-lama-select" onchange="onProductSelectChange()" class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary">
+          <option value="">-- Pilih Produk --</option>
+          ${options}
+        </select>
+      </div>`;
+    }
+  } else {
+    if (btnBaru) btnBaru.className = 'px-6 py-2 bg-[#1a5c2a] text-white text-sm font-semibold rounded-r border border-[#1a5c2a]';
+    if (btnLama) btnLama.className = 'px-6 py-2 bg-white text-gray-700 text-sm font-semibold rounded-l border border-gray-300 hover:bg-gray-50';
+    
+    if (container) {
+      container.innerHTML = `<div>
+        <label class="block text-xs font-bold text-gray-600 mb-2">NAMA PRODUK BARU <span class="text-red-500">*</span></label>
+        <input type="text" id="produk-baru-input" oninput="onProductInputChange()" placeholder="Masukkan nama produk baru" class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary" />
+        <p id="product-validation-error" class="text-xs text-red-500 mt-1 hidden"></p>
+      </div>`;
+    }
+  }
+  updateTdsVersionField();
+}
+
+function onProductSelectChange() {
+  updateTdsVersionField();
+}
+
+function onProductInputChange() {
+  validateProductName();
+  updateTdsVersionField();
+}
+
+function validateProductName() {
+  const inp = document.getElementById('produk-baru-input');
+  const err = document.getElementById('product-validation-error');
+  if (!inp || !err) return false;
+  
+  const val = inp.value.trim();
+  if (!val) {
+    err.textContent = "Nama produk tidak boleh kosong.";
+    err.classList.remove('hidden');
+    return false;
+  }
+  
+  const match = pmData.find(p => p.nama.toLowerCase() === val.toLowerCase());
+  if (match) {
+    err.textContent = `Nama produk "${val}" sudah terdaftar di Product Master. Silakan gunakan opsi 'Produk Lama'.`;
+    err.classList.remove('hidden');
+    return false;
+  } else {
+    err.textContent = "";
+    err.classList.add('hidden');
+    return true;
+  }
+}
+
+function updateTdsVersionField() {
+  const btnLama = document.getElementById('btn-produk-lama');
+  const isLama = btnLama && btnLama.classList.contains('bg-avian-primary');
+  let name = '';
+  
+  if (isLama) {
+    const sel = document.getElementById('produk-lama-select');
+    if (sel) name = sel.value;
+  } else {
+    const inp = document.getElementById('produk-baru-input');
+    if (inp) name = inp.value.trim();
+  }
+  
+  let nextVer = 1;
+  if (name) {
+    const matches = pmData.filter(p => p.nama.toLowerCase() === name.toLowerCase());
+    if (matches.length > 0) {
+      const maxVer = Math.max(...matches.map(p => p.versi || 0));
+      nextVer = maxVer + 1;
+    }
+  }
+  
+  const verInp = document.getElementById('tds-versi-input');
+  if (verInp) {
+    verInp.value = nextVer;
+  }
+}
+
+function clearTdsForm() {
+  // Reset all selects in form to first option
+  const fv = document.getElementById('form-view');
+  fv.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
+  // Clear all text inputs and textareas (skip hidden/readonly)
+  fv.querySelectorAll('input[type="text"], input:not([type]), textarea').forEach(el => {
+    if (!el.readOnly && el.id !== 'tds-versi-input') el.value = '';
+  });
+  // Reset template picker and form area in cara pemakaian
+  const katSel = document.getElementById('kategori-produk-select');
+  if (katSel) { katSel.value = ''; }
+  // Reset cara pemakaian template cards
+  document.querySelectorAll('.tmpl-card').forEach(c => {
+    c.classList.remove('active');
+    c.style.opacity = '1';
+    c.style.pointerEvents = 'auto';
+  });
+  const formArea = document.getElementById('tmpl-form-area');
+  if (formArea) { formArea.innerHTML = ''; renderAddStepBar(formArea); }
+  
+  // Set to default type
+  setProdukType('lama');
+}
+
+function prefillTdsForm(r) {
+  if (!r) return;
+  // set kategori
+  const katSel = document.getElementById('kategori-produk-select');
+  if (katSel) {
+    const katMap = {'Solvent Based':'solvent-based','Construction':'construction','Waterproofing':'waterproofing','Water Based':'water-based'};
+    const val = katMap[r.kategori] || '';
+    katSel.value = val;
+    if (val) onKategoriChange(val);
+  }
+  
+  // Relaunch or edit sets type to Produk Lama since it already exists
+  setProdukType('lama');
+  const sel = document.getElementById('produk-lama-select');
+  if (sel) {
+    if (!Array.from(sel.options).some(o => o.value === r.nama)) {
+      const opt = document.createElement('option');
+      opt.value = r.nama;
+      opt.textContent = r.nama;
+      sel.appendChild(opt);
+    }
+    sel.value = r.nama;
+  }
+  
+  const fv = document.getElementById('form-view');
+  const mode = fv.dataset.formMode;
+  if (mode === 'edit') {
+    const verInput = document.getElementById('tds-versi-input');
+    if (verInput) verInput.value = r.versi;
+  } else {
+    updateTdsVersionField();
+  }
+  
+  const pmProduct = pmData.find(p => p.nama.toLowerCase() === r.nama.toLowerCase());
+  const descTextarea = fv.querySelector('textarea');
+  if (descTextarea) {
+    descTextarea.value = pmProduct ? pmProduct.deskripsi : '';
+  }
+}
+
+function openTdsForm(mode, id) {
+  document.getElementById('list-tds-view').classList.remove('active');
+  const fv = document.getElementById('form-view');
+  fv.style.display = 'block';
+  fv.dataset.formMode = mode;
+  fv.dataset.formId   = id || '';
+
+  if (mode === 'new') {
+    clearTdsForm();
+  } else if (mode === 'relaunch' && id) {
+    clearTdsForm();
+    const r = tdsData.find(x => x.id === id);
+    if (r) prefillTdsForm(r);
+  } else if (mode === 'edit' && id) {
+    clearTdsForm();
+    const r = tdsData.find(x => x.id === id);
+    if (r) prefillTdsForm(r);
+  }
+}
+
+function backToList() {
+  const fv = document.getElementById('form-view');
+  fv.style.display = 'none';
+  relaunchSourceId = null;
+  navigateTo('list-tds');
+}
+
+// hook Save/Submit buttons in form
+function onTdsFormSave() {
+  const fv = document.getElementById('form-view');
+  const mode = fv.dataset.formMode;
+  const today = new Date();
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const dateStr = `${today.getDate()}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+  const dateDisplay = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+
+  const katEl = document.getElementById('kategori-produk-select');
+  const katMap = {'solvent-based':'Solvent Based','construction':'Construction','waterproofing':'Waterproofing','water-based':'Water Based'};
+  const kategori = katEl ? (katMap[katEl.value] || katEl.value) : '';
+
+  const btnLama = document.getElementById('btn-produk-lama');
+  const isLama = btnLama && btnLama.classList.contains('bg-avian-primary');
+  let nama = '';
+  
+  if (isLama) {
+    const sel = document.getElementById('produk-lama-select');
+    if (sel) nama = sel.value;
+  } else {
+    const inp = document.getElementById('produk-baru-input');
+    if (inp) nama = inp.value.trim();
+  }
+
+  if (!nama) {
+    alert("Nama produk tidak boleh kosong!");
+    return;
+  }
+
+  if (!isLama) {
+    const isValid = validateProductName();
+    if (!isValid) {
+      alert("Validasi Gagal: Nama produk baru sudah terdaftar atau tidak valid.");
+      return;
+    }
+  }
+
+  const verInput = document.getElementById('tds-versi-input');
+  const verVal = parseInt(verInput ? verInput.value : 1);
+
+  if (mode === 'relaunch' && relaunchSourceId) {
+    const src = tdsData.find(x => x.id === relaunchSourceId);
+    const newRow = {
+      ...(src || {}),
+      id: nextTdsId++,
+      tanggal: dateStr,
+      versi: verVal,
+      lastEditName: LOGGED_IN_USER,
+      lastEditDate: dateDisplay,
+      approvals: { rdi:null, rdiDir:null, mktMgr:null, mktDir:null },
+      kategori: kategori || (src ? src.kategori : ''),
+      nama: nama
+    };
+    tdsData.unshift(newRow);
+    syncPmFromTds();
+  } else if (mode === 'new') {
+    const newRow = {
+      id: nextTdsId++, tanggal: dateStr, noForm: 'TDS/' + nextTdsId,
+      nama: nama, kategori: kategori, versi: verVal,
+      pdf: [], lastEditName: LOGGED_IN_USER, lastEditDate: dateDisplay,
+      approvals: { rdi:null, rdiDir:null, mktMgr:null, mktDir:null }
+    };
+    tdsData.unshift(newRow);
+    syncPmFromTds();
+  } else if (mode === 'edit') {
+    const editId = parseInt(fv.dataset.formId);
+    const r = tdsData.find(x => x.id === editId);
+    if (r) {
+      r.nama = nama;
+      r.kategori = kategori;
+      r.lastEditName = LOGGED_IN_USER;
+      r.lastEditDate = dateDisplay;
+      syncPmFromTds();
+    }
+  }
+  relaunchSourceId = null;
+  backToList();
+}
+
+// ================================================================
+// PRODUCT MASTER
+// ================================================================
+let pmFiltered = [];
+let pmSortKey  = '';
+let pmSortAsc  = true;
+let pmPage     = 1;
+let pmEditId   = null;
+
+function applyPmFilters() {
+  const nama     = (document.getElementById('pmf-nama')?.value||'').toLowerCase();
+  const kategori = document.getElementById('pmf-kategori')?.value||'';
+  const search   = (document.getElementById('pm-search')?.value||'').toLowerCase();
+
+  pmFiltered = pmData.filter(r => {
+    if (nama     && !r.nama.toLowerCase().includes(nama))     return false;
+    if (kategori && r.kategori !== kategori)                  return false;
+    if (search   && !r.nama.toLowerCase().includes(search) && !r.kategori.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  pmPage = 1;
+  _renderPmRows();
+}
+
+function sortPm(key) {
+  if (pmSortKey === key) pmSortAsc = !pmSortAsc;
+  else { pmSortKey = key; pmSortAsc = true; }
+  pmFiltered.sort((a,b) => {
+    let av = a[key]||'', bv = b[key]||'';
+    return (av<bv?-1:av>bv?1:0)*(pmSortAsc?1:-1);
+  });
+  renderPmTable();
+}
+
+function renderPmTable() {
+  syncPmFromTds();
+  pmFiltered = pmData.filter(() => true);
+  _renderPmRows();
+}
+function _renderPmTableAlias() { renderPmTable(); }
+function __renderPmTable_orig() {  // unused alias kept for safety
+}
+function _renderPmRows() {
+  const showN = parseInt(document.getElementById('pm-show-count')?.value||10);
+  const start = (pmPage-1)*showN;
+  const pageData = pmFiltered.slice(start, start+showN);
+  const totalPages = Math.ceil(pmFiltered.length/showN);
+  const tbody = document.getElementById('pm-tbody');
+
+  if (!pageData.length) {
+    tbody.innerHTML = '<tr class="dt-empty"><td colspan="4">Tidak ada data.</td></tr>';
+  } else {
+    tbody.innerHTML = pageData.map(r => `<tr>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="dt-action-btn btn-green" title="View" onclick="openPmView(${r.id})">
+            <span class="material-symbols-outlined" style="font-size:14px;">visibility</span>
+          </button>
+          <button class="dt-action-btn btn-blue" title="Edit" onclick="openPmEdit(${r.id})">
+            <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
+          </button>
+          <button class="dt-action-btn btn-red" title="Hapus" onclick="openDeleteModal('pm',${r.id})">
+            <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+          </button>
+        </div>
+      </td>
+      <td style="font-weight:600;">${r.nama}</td>
+      <td>${r.kategori}</td>
+      <td style="font-size:12px;color:#6b7280;max-width:300px;">${r.deskripsi || '<span style="color:#d1d5db;">—</span>'}</td>
+    </tr>`).join('');
+  }
+
+  const from = pmFiltered.length ? start+1 : 0;
+  const to   = Math.min(start+showN, pmFiltered.length);
+  document.getElementById('pm-info-label').textContent =
+    `Showing ${from} to ${to} of ${pmFiltered.length} entries`;
+
+  const pg = document.getElementById('pm-pagination');
+  pg.innerHTML = '';
+  for (let i=1;i<=totalPages;i++) {
+    const b = document.createElement('button');
+    b.className = 'dt-page-btn'+(i===pmPage?' active':'');
+    b.textContent = i;
+    b.onclick = ()=>{ pmPage=i; renderPmTable(); };
+    pg.appendChild(b);
+  }
+}
+
+function togglePmFilter() { document.getElementById('pm-filter-panel').classList.toggle('open'); }
+function resetPmFilters() {
+  ['pmf-nama','pmf-kategori','pm-search'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  applyPmFilters();
+}
+
+function openPmView(id) {
+  const r = pmData.find(x => x.id === id);
+  if (!r) return;
+  
+  document.getElementById('pm-view-nama').textContent = r.nama;
+  document.getElementById('pm-view-kategori').textContent = r.kategori;
+  document.getElementById('pm-view-deskripsi').textContent = r.deskripsi || '—';
+  
+  const imgContainer = document.getElementById('pm-view-gambar-container');
+  if (imgContainer) {
+    imgContainer.innerHTML = r.gambar 
+      ? `<img src="${r.gambar}" style="width:100%;height:100%;object-fit:cover;"/>` 
+      : '<span class="text-gray-300 text-xs font-semibold">No Image</span>';
+  }
+  
+  populatePmHistoryTable(r.nama, 'pm-view-history-tbody');
+  
+  document.getElementById('pm-list-section').style.display = 'none';
+  document.getElementById('pm-edit-section').style.display = 'none';
+  document.getElementById('pm-view-section').style.display = 'block';
+}
+
+function closePmView() {
+  document.getElementById('pm-view-section').style.display = 'none';
+  document.getElementById('pm-list-section').style.display = 'block';
+  renderPmTable();
+}
+
+function populatePmHistoryTable(productName, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  
+  // Find all TDS entries matching this product name
+  const history = tdsData.filter(t => t.nama.toLowerCase() === productName.toLowerCase());
+  
+  if (history.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400" style="padding: 24px;">Belum ada riwayat dokumen TDS.</td></tr>';
+  } else {
+    // Sort history by version descending
+    history.sort((a, b) => b.versi - a.versi);
+    
+    tbody.innerHTML = history.map(t => {
+      const pdfBadges = (t.pdf || []).map(lang => {
+        const fileUrl = `https://avianbrands.com/uploads/tds/${t.nama.toLowerCase().replace(/\s+/g, '-')}-${lang.toLowerCase()}.pdf`;
+        return `<div style="display:inline-flex;align-items:center;gap:8px;margin-right:16px;background:#f3f4f6;padding:4px 10px;border-radius:6px;border:1px solid #e5e7eb;flex-wrap:wrap;">
+          <button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="window.open('${fileUrl}', '_blank')" style="margin:0;cursor:pointer;font-weight:700;font-size:10px;padding:2px 6px;">${lang}</button>
+          <a href="${fileUrl}" target="_blank" style="font-size:11px;color:#006442;font-family:monospace;text-decoration:underline;word-break:break-all;" title="${fileUrl}">${fileUrl}</a>
+          <button class="dt-action-btn" title="Salin URL" onclick="navigator.clipboard.writeText('${fileUrl}');alert('URL berhasil disalin!')" style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:#9ca3af;cursor:pointer;flex-shrink:0;">
+            <span class="material-symbols-outlined" style="font-size:13px;">content_copy</span>
+          </button>
+        </div>`;
+      }).join(' ');
+      
+      return `<tr>
+        <td style="font-size:12px;">${t.tanggal}</td>
+        <td><span style="font-size:12px;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-weight:600;">${t.versi}</span></td>
+        <td>${pdfBadges || '<span style="color:#d1d5db;font-size:11px;">— Belum ada PDF —</span>'}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function openPmEdit(id) {
+  pmEditId = id;
+  const r = pmData.find(x => x.id === id);
+  if (!r) return;
+  
+  document.getElementById('pm-edit-nama').value = r.nama;
+  document.getElementById('pm-edit-kategori').value = r.kategori;
+  document.getElementById('pm-edit-deskripsi').value = r.deskripsi || '';
+  
+  const prev = document.getElementById('pm-edit-gambar-preview');
+  if (prev) {
+    prev.innerHTML = r.gambar 
+      ? `<img src="${r.gambar}" style="width:100%;height:100%;object-fit:cover;"/>` 
+      : '<span class="text-gray-300 text-xs font-semibold">No Image</span>';
+    delete prev.dataset.base64;
+  }
+  
+  populatePmHistoryTable(r.nama, 'pm-edit-history-tbody');
+  
+  document.getElementById('pm-list-section').style.display = 'none';
+  document.getElementById('pm-view-section').style.display = 'none';
+  document.getElementById('pm-edit-section').style.display = 'block';
+}
+
+function closePmEdit() {
+  pmEditId = null;
+  document.getElementById('pm-edit-section').style.display = 'none';
+  document.getElementById('pm-list-section').style.display = 'block';
+  renderPmTable();
+}
+
+function previewPmEditImage(input) {
+  const prev = document.getElementById('pm-edit-gambar-preview');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;"/>`;
+      prev.dataset.base64 = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function savePmEdit() {
+  const r = pmData.find(x => x.id === pmEditId);
+  if (!r) return;
+  
+  const originalName = r.nama;
+  const newName = document.getElementById('pm-edit-nama').value.trim();
+  const newKategori = document.getElementById('pm-edit-kategori').value;
+  const newDeskripsi = document.getElementById('pm-edit-deskripsi').value;
+  
+  if (!newName) {
+    alert("Nama produk tidak boleh kosong!");
+    return;
+  }
+  
+  r.nama = newName;
+  r.kategori = newKategori;
+  r.deskripsi = newDeskripsi;
+  
+  // Save preview base64 image if uploaded
+  const prev = document.getElementById('pm-edit-gambar-preview');
+  if (prev && prev.dataset.base64) {
+    r.gambar = prev.dataset.base64;
+    delete prev.dataset.base64;
+  }
+  
+  // Sync name/category update back to tdsData
+  tdsData.forEach(t => {
+    if (t.nama.toLowerCase() === originalName.toLowerCase()) {
+      t.nama = newName;
+      t.kategori = newKategori;
+    }
+  });
+  
+  closePmEdit();
+}
+
+// ================================================================
+// DELETE (shared)
+// ================================================================
+let deleteTarget = null;
+
+function openDeleteModal(type, id) {
+  deleteTarget = { type, id };
+  const data = type === 'tds' ? tdsData.find(x=>x.id===id) : pmData.find(x=>x.id===id);
+  document.getElementById('delete-modal-desc').textContent =
+    `"${data ? data.nama : ''}" akan dihapus permanen dan tidak dapat dikembalikan.`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function closeDeleteModal() {
+  deleteTarget = null;
+  document.getElementById('delete-modal').classList.remove('open');
+}
+function confirmDelete() {
+  if (!deleteTarget) return;
+  if (deleteTarget.type === 'tds') {
+    tdsData = tdsData.filter(x=>x.id!==deleteTarget.id);
+    applyTdsFilters();
+  } else {
+    pmData = pmData.filter(x=>x.id!==deleteTarget.id);
+    renderPmTable();
+  }
+  closeDeleteModal();
+}
+
+// ================================================================
+// INIT
+// ================================================================
+applyTdsFilters();
+setProdukType('lama');
+</script>
+<div id="form-view" style="display:none;"><div class="p-8 flex-1 overflow-y-auto space-y-8 max-w-7xl mx-auto w-full">
+<!-- Page Title -->
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-bold text-gray-800">Create New TDS Document</h2>
+<div class="flex gap-3">
+<div class="px-4 py-2 bg-avian-primary text-white text-xs font-bold rounded flex items-center">TDS Code: TDS-AVN-2023-001</div>
+<div class="px-4 py-2 border border-avian-accent text-avian-accent text-xs font-bold rounded">DRAFT</div>
+<button class="px-6 py-2 border border-gray-300 bg-white text-sm font-semibold rounded hover:bg-gray-50 flex items-center" onclick="backToList()">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>BACK</button>
+</div>
+</div>
+
+<!-- PIC MM -->
+<div class="bg-white rounded shadow-sm border border-gray-200 p-6 mb-8">
+<div class="max-w-xs">
+<label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">PIC MM <span class="text-red-500">*</span></label>
+<select class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary">
+<option value="">Pilih PIC MM</option>
+<option>Suyanto Hadi Kusuma</option><option>Mely Yanti</option><option>Ellen Yovita</option><option>Arifin Gunawan</option><option>Regina Yolanda Sukoco</option><option>Yohanes Chistian</option><option>Ismail</option><option>Singgih</option>
+</select>
+</div>
+</div>
+
+<!-- BEGIN: INFORMASI PRODUK -->
+<section class="bg-white rounded shadow-sm overflow-hidden border border-gray-200" data-purpose="section-informasi-produk">
+<div class="card-header-avian">INFORMASI PRODUK</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
+<div class="md:col-span-8 space-y-4">
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-2">TIPE PRODUK <span class="text-red-500">*</span></label>
+<div class="flex">
+<button type="button" class="px-6 py-2 bg-avian-primary text-white text-sm font-semibold rounded-l border border-avian-primary" id="btn-produk-lama" onclick="setProdukType('lama')">Produk Lama</button>
+<button type="button" class="px-6 py-2 bg-white text-gray-700 text-sm font-semibold rounded-r border border-gray-300 border-l-0 hover:bg-gray-50" id="btn-produk-baru" onclick="setProdukType('baru')">Produk Baru</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div id="product-selection-container"></div>
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-2">KATEGORI PRODUK <span class="text-red-500">*</span></label>
+<select id="kategori-produk-select" class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary" onchange="onKategoriChange(this.value)"><option value="">-- Pilih Kategori --</option><option value="solvent-based">Solvent Based</option><option value="construction">Construction</option><option value="waterproofing">Waterproofing</option><option value="water-based">Water Based</option></select>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-2">VERSI TDS</label>
+<input type="text" id="tds-versi-input" disabled class="w-full border-gray-300 bg-gray-100 rounded text-sm text-gray-500 focus:ring-0 cursor-not-allowed" value="1" />
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-2">DESKRIPSI PRODUK</label>
+<textarea class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary" placeholder="Masukkan deskripsi produk..." rows="6">No Drop Anti Panas adalah cat pelapis anti bocor yang sangat kuat, dapat menurunkan suhu ruangan hingga 7°C karena memiliki teknologi UV Shield, teknologi kedap airnya melindungi sehingga tembok tidak lembab, elastis, anti jamur dan lumut.</textarea>
+</div>
+<div class="mt-4">
+<label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">Green Label Singapore</label>
+<div class="max-w-xs">
+<select class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary">
+<option value="ya">Ya</option><option value="tidak">Tidak</option>
+</select>
+</div>
+</div>
+</div>
+<div class="md:col-span-4">
+<label class="block text-xs font-bold text-gray-600 mb-2">GAMBAR PRODUK</label>
+<div class="border-2 border-dashed border-gray-300 rounded-lg h-72 flex flex-col items-center justify-center bg-gray-50 group hover:border-avian-primary transition-colors cursor-pointer relative">
+<img alt="Product Preview" class="max-h-56 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<button class="bg-white px-3 py-1 rounded text-xs font-bold shadow-sm">UBAH GAMBAR</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: INFORMASI PRODUK -->
+
+<!-- BEGIN: FITUR & KEUNGGULAN -->
+<section class="bg-white rounded shadow-sm overflow-hidden border border-gray-200" data-purpose="section-fitur">
+<div class="card-header-avian">
+<span>FITUR &amp; KEUNGGULAN</span>
+<button class="w-8 h-8 flex items-center justify-center bg-white/20 rounded hover:bg-white/40" onclick="addRow()">+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="bg-gray-50 text-[10px] uppercase text-gray-500 font-bold border-b">
+<tr><th class="px-6 py-3 w-16">No</th><th class="px-6 py-3">Description</th><th class="px-6 py-3 w-24 text-center">Action</th></tr>
+</thead>
+<tbody class="divide-y" id="fitur-table-body">
+<tr><td class="px-6 py-4 row-number">1</td><td class="px-6 py-4"><div class="space-y-2"><select class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" onchange="handleSelectChange(this)"><option selected="">Mencegah tembok lembab</option><option>Tahan Cuaca</option><option>Elastis</option><option>Daya rekat terbaik</option><option>Menutup Retak Rambut dengan Sempurna</option><option>Melindungi dari karat</option><option>Tahan Alkali dan Effloresence</option><option>Green label Singapore</option><option value="Others">Others (isi sendiri)</option></select><input class="hidden w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" placeholder="Others (isi sendiri)" type="text"/></div></td><td class="px-6 py-4 text-center"><button class="text-red-500 hover:text-red-700" onclick="removeRow(this)"><svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></td></tr>
+<tr><td class="px-6 py-4 row-number">2</td><td class="px-6 py-4"><div class="space-y-2"><select class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" onchange="handleSelectChange(this)"><option>Mencegah tembok lembab</option><option selected="">Tahan Cuaca</option><option>Elastis</option><option>Daya rekat terbaik</option><option>Menutup Retak Rambut dengan Sempurna</option><option>Melindungi dari karat</option><option>Tahan Alkali dan Effloresence</option><option>Green label Singapore</option><option value="Others">Others (isi sendiri)</option></select><input class="hidden w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" placeholder="Others (isi sendiri)" type="text"/></div></td><td class="px-6 py-4 text-center"><button class="text-red-500 hover:text-red-700" onclick="removeRow(this)"><svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></td></tr>
+<tr><td class="px-6 py-4 row-number">3</td><td class="px-6 py-4"><div class="space-y-2"><select class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" onchange="handleSelectChange(this)"><option>Mencegah tembok lembab</option><option>Tahan Cuaca</option><option selected="">Elastis</option><option>Daya rekat terbaik</option><option>Menutup Retak Rambut dengan Sempurna</option><option>Melindungi dari karat</option><option>Tahan Alkali dan Effloresence</option><option>Green label Singapore</option><option value="Others">Others (isi sendiri)</option></select><input class="hidden w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" placeholder="Others (isi sendiri)" type="text"/></div></td><td class="px-6 py-4 text-center"><button class="text-red-500 hover:text-red-700" onclick="removeRow(this)"><svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: FITUR & KEUNGGULAN -->
+
+<!-- BEGIN: JENIS PERMUKAAN & KETERANGAN -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<section class="bg-white rounded shadow-sm border border-gray-200" data-purpose="section-jenis-permukaan">
+<div class="card-header-avian">JENIS PERMUKAAN</div>
+<div class="p-6 space-y-4">
+<div class="space-y-6">
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-3 uppercase tracking-wide">AREA APLIKASI</label>
+<div class="grid grid-cols-1 gap-y-2">
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Eksterior</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Interior</label>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-3 uppercase tracking-wide">BIDANG APLIKASI</label>
+<div class="grid grid-cols-2 gap-y-2 gap-x-4">
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Dinding</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Plafon</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Genteng</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> uPVC</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Talang air</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Atap metal</label>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-3 uppercase tracking-wide">TIPE SUBSTRAT</label>
+<div class="grid grid-cols-2 gap-y-2 gap-x-4">
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Beton</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Plester</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Fiber</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Galvanum</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Seng</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> PVC</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Cement board</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Asbes</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Kayu</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Besi</label>
+<label class="flex items-center gap-2 text-xs text-gray-700"><input class="rounded text-avian-primary focus:ring-avian-primary" type="checkbox"/> Bata ringan</label>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="space-y-8">
+<!-- FITUR UTAMA -->
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden" data-purpose="section-fitur-utama-card">
+<div class="bg-[#1a5c2a] text-white px-5 py-3 font-bold uppercase text-sm tracking-wide">FITUR UTAMA (MAKS. 4)</div>
+<div class="p-6">
+<div class="grid grid-cols-1 gap-y-3">
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">15 tahun perlindungan</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">7 tahun perlindungan</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Anti bakteri</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Anti jamur dan lumut</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Aplikasi eksterior dan interior</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Cepat kering</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Daya rekat kuat</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Efek daun talas</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Ekonomis</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Elastis</span></label>
+<label class="flex items-center gap-3 text-xs text-gray-700 cursor-pointer group"><input class="rounded text-avian-primary focus:ring-avian-primary w-4 h-4 border-gray-300 fitur-utama-cb" onchange="limitCheckboxes('.fitur-utama-cb', 4)" type="checkbox"/><span class="group-hover:text-avian-primary transition-colors">Green label Singapore</span></label>
+</div>
+<p class="mt-4 text-[10px] text-gray-400 italic">* Pilih maksimal 4 fitur utama untuk ditampilkan pada dokumen.</p>
+</div>
+</section>
+<!-- KETERANGAN PRODUK -->
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden" data-purpose="section-keterangan">
+<div class="card-header-avian">KETERANGAN PRODUK</div>
+<div class="p-6 space-y-4">
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-1">Keterangan Tambahan</label>
+<textarea class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary" placeholder="Masukkan keterangan tambahan produk..." rows="3">Penurunan suhu ruangan hingga 7°C tergantung pada warna, substrat, dan suhu udara sekitar. Agar bisa menurunkan suhu hingga 7°C dibutuhkan min 3 lapis.</textarea>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- END: JENIS PERMUKAAN & KETERANGAN -->
+
+<!-- BEGIN: SPESIFIKASI -->
+<section class="bg-white rounded shadow-sm overflow-hidden border border-gray-200" data-purpose="section-spesifikasi">
+<div class="card-header-avian">SPESIFIKASI</div>
+<div class="p-6 space-y-6">
+<div>
+<p class="text-[10px] font-bold text-gray-500 mb-3">Pilih Spesifikasi yang ditampilkan:</p>
+<div class="flex flex-wrap gap-2"><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="warna" onchange="toggleSpecCard('warna', this.checked)" type="checkbox"/> WARNA</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="penampilan" onchange="toggleSpecCard('penampilan', this.checked)" type="checkbox"/> PENAMPILAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="kemasan" onchange="toggleSpecCard('kemasan', this.checked)" type="checkbox"/> KEMASAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="pengencer" onchange="toggleSpecCard('pengencer', this.checked)" type="checkbox"/> PENGENCER</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="bj25" onchange="toggleSpecCard('bj25', this.checked)" type="checkbox"/> BERAT JENIS 25°C</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="daya-sebar" onchange="toggleSpecCard('daya-sebar', this.checked)" type="checkbox"/> DAYA SEBAR TEORITIS</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tebal-film" onchange="toggleSpecCard('tebal-film', this.checked)" type="checkbox"/> KETEBALAN FILM PER LAPIS</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="cara-aplikasi" onchange="toggleSpecCard('cara-aplikasi', this.checked)" type="checkbox"/> CARA APLIKASI</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="kadar-padatan" onchange="toggleSpecCard('kadar-padatan', this.checked)" type="checkbox"/> KADAR PADATAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="waktu-kering" onchange="toggleSpecCard('waktu-kering', this.checked)" type="checkbox"/> WAKTU KERING 25°C</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tenggang-waktu" onchange="toggleSpecCard('tenggang-waktu', this.checked)" type="checkbox"/> TENGGANG WAKTU ANTAR LAPISAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="lapis-anjur" onchange="toggleSpecCard('lapis-anjur', this.checked)" type="checkbox"/> JUMLAH LAPISAN YANG DIANJURKAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input checked="" class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="kekentalan" onchange="toggleSpecCard('kekentalan', this.checked)" type="checkbox"/> KEKENTALAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="bj30" onchange="toggleSpecCard('bj30', this.checked)" type="checkbox"/> BERAT JENIS 30°C</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tahan-kotoran" onchange="toggleSpecCard('tahan-kotoran', this.checked)" type="checkbox"/> KETAHANAN TERHADAP KOTORAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tahan-eff" onchange="toggleSpecCard('tahan-eff', this.checked)" type="checkbox"/> KETAHANAN EFFLORESCENCE</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tahan-air" onchange="toggleSpecCard('tahan-air', this.checked)" type="checkbox"/> KETAHANAN TERHADAP AIR</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tahan-gosok" onchange="toggleSpecCard('tahan-gosok', this.checked)" type="checkbox"/> KETAHANAN GOSOKAN</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="pot-life" onchange="toggleSpecCard('pot-life', this.checked)" type="checkbox"/> POT LIFE</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="daya-sebar-10" onchange="toggleSpecCard('daya-sebar-10', this.checked)" type="checkbox"/> DAYA SEBAR BATA RINGAN 10CM</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="daya-sebar-7.5" onchange="toggleSpecCard('daya-sebar-7.5', this.checked)" type="checkbox"/> DAYA SEBAR BATA RINGAN 7.5CM</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="berat-jenis" onchange="toggleSpecCard('berat-jenis', this.checked)" type="checkbox"/> BERAT JENIS</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="tebal-aplikasi" onchange="toggleSpecCard('tebal-aplikasi', this.checked)" type="checkbox"/> TEBAL APLIKASI</label><label class="flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold text-gray-700 cursor-pointer bg-white"><input class="rounded text-avian-primary focus:ring-avian-primary w-3.5 h-3.5 spec-toggle" data-spec="kering-sempurna" onchange="toggleSpecCard('kering-sempurna', this.checked)" type="checkbox"/> KERING SEMPURNA</label></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="spec-cards-container" style="display: grid; grid-template-columns: repeat(4, 1fr); align-items: stretch;">
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="warna"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">WARNA</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('warna')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="ASTM D1475"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="Input warna..." type="text"/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="penampilan"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">PENAMPILAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('penampilan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><select class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary"><option>Tidak Kilap</option><option>Sedang</option><option>Kilap</option><option>Powder</option></select></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="kemasan"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KEMASAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kemasan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" placeholder="Input kemasan..."/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="pengencer"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">PENGENCER</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('pengencer')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><select class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary"><option>Air bersih</option><option>Avia Thinner Enamel</option><option>Thinner B</option><option>Afduner</option></select></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="bj25"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">BERAT JENIS 25°C</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('bj25')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="ASTM D1475"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="daya-sebar"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">DAYA SEBAR TEORITIS</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('daya-sebar')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="m²/kg/lapis" type="text"/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="tebal-film"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KETEBALAN FILM PER LAPIS</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tebal-film')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><div class="space-y-2"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-medium text-gray-600 w-12">Basah</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div><div class="flex items-center gap-2"><span class="text-[10px] font-medium text-gray-600 w-12">Kering</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div></div></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="cara-aplikasi"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">CARA APLIKASI</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('cara-aplikasi')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><div class="grid grid-cols-2 gap-2"><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Kuas</span></label><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Roll</span></label><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Spray</span></label><label class="flex items-center gap-1"><input class="rounded text-avian-primary w-3 h-3" type="checkbox"/><span class="text-[9px]">Airless Spray</span></label></div></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="kadar-padatan"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KADAR PADATAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kadar-padatan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input %" type="text"/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="waktu-kering"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">WAKTU KERING 25°C</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('waktu-kering')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><div class="space-y-2"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-medium text-gray-600 w-24">Kering Sentuh</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div><div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-medium text-gray-600 w-24">Kering Keras</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div><div class="flex items-center gap-2"><span class="text-[10px] font-medium text-gray-600 w-24">Kering Amplas</span><input class="flex-1 p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" placeholder="..." type="text"/></div></div></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="tenggang-waktu"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[8px] font-bold uppercase">TENGGANG WAKTU ANTAR LAPISAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('tenggang-waktu')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input jam..." type="text"/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="lapis-anjur"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[8px] font-bold uppercase">JUMLAH LAPISAN DIANJURKAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('lapis-anjur')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input jumlah..." type="text"/></div></div></div>
+<div class="rounded border border-gray-200 overflow-hidden bg-white spec-card flex flex-col h-full" data-spec="kekentalan"><div class="bg-[#1a5c2a] text-white px-4 py-2 flex justify-between items-center"><span class="text-[10px] font-bold uppercase">KEKENTALAN</span><button class="text-white hover:text-red-300 flex items-center" onclick="removeSpecCard('kekentalan')"><span class="material-symbols-outlined text-sm">close</span></button></div><div class="p-3 grid gap-4 text-[10px] flex-1 items-start flex-col"><div class="mb-3"><label class="block text-gray-500 font-bold mb-1">Standar Test</label><input class="w-full p-1.5 text-[10px] border border-gray-300 bg-white rounded focus:ring-1 focus:ring-avian-primary" type="text" value="-"/></div><div><label class="block text-gray-500 font-bold mb-1">Keterangan</label><input class="w-full p-2 text-[10px] border-gray-200 rounded focus:ring-avian-primary" placeholder="Input nilai..." type="text"/></div></div></div>
+</div>
+</div>
+</section>
+<!-- END: SPESIFIKASI -->
+
+<!-- BEGIN: PERSIAPAN PERMUKAAN -->
+<script>
+  function renumberPrepCards() {
+    const cards = document.querySelectorAll('#prep-cards-container .prep-card');
+    cards.forEach((card, index) => {
+      const badge = card.querySelector('.prep-step-number');
+      if (badge) badge.textContent = (index + 1) + '.';
+    });
+  }
+  function removePrepCard(btn) {
+    btn.closest('.prep-card').remove();
+    renumberPrepCards();
+  }
+  function addPrepCard() {
+    const container = document.getElementById('prep-cards-container');
+    const count = container.querySelectorAll('.prep-card').length;
+    const newCard = document.createElement('div');
+    newCard.className = 'prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative';
+    newCard.innerHTML = `
+      <button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm">
+        <span class="material-symbols-outlined text-base">delete</span>
+      </button>
+      <div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center">
+        <span class="text-xs text-gray-400 font-medium">[Illustration]</span>
+      </div>
+      <div class="p-4 bg-white flex-1">
+        <p class="text-[11px] leading-relaxed text-gray-700 flex items-start gap-1">
+          <span class="font-bold text-[#006442] flex-shrink-0 prep-step-number">${count + 1}.</span>
+          <input class="border-0 border-b border-gray-200 focus:ring-0 text-[11px] text-gray-700 bg-transparent w-full p-0" type="text" placeholder="Masukkan langkah persiapan..."/>
+        </p>
+      </div>`;
+    container.appendChild(newCard);
+    renumberPrepCards();
+  }
+</script>
+<section class="bg-white rounded shadow-sm overflow-hidden border border-gray-200" data-purpose="section-persiapan">
+<div class="bg-[#006442] text-white px-5 py-3 font-bold uppercase text-sm tracking-wide flex justify-between items-center">
+  <span>PERSIAPAN PERMUKAAN</span>
+  <button onclick="addPrepCard()" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded hover:bg-white/40 transition-colors text-lg font-bold leading-none">+</button>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="prep-cards-container">
+<div class="prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"><button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm"><span class="material-symbols-outlined text-base">delete</span></button><div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center"><span class="text-xs text-gray-400 font-medium">[Illustration: Measuring Moisture]</span></div><div class="p-4 bg-white flex-1"><p class="text-[11px] leading-relaxed text-gray-700"><span class="font-bold text-[#006442] mr-1 prep-step-number">1.</span>Pastikan kondisi tembok kering dengan kadar air maksimal 16% dengan menggunakan alat Protimeter, kadar alkali (pH) dibawah 9.</p></div></div>
+<div class="prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"><button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm"><span class="material-symbols-outlined text-base">delete</span></button><div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center"><span class="text-xs text-gray-400 font-medium">[Illustration: Scraping Paint]</span></div><div class="p-4 bg-white flex-1"><p class="text-[11px] leading-relaxed text-gray-700"><span class="font-bold text-[#006442] mr-1 prep-step-number">2.</span>Kupas hingga bersih jika daya rekat cat lama sudah rusak menggunakan <span class="font-bold text-avian-primary">VIP Pengupas Cat Tembok</span>.</p></div></div>
+<div class="prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"><button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm"><span class="material-symbols-outlined text-base">delete</span></button><div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center"><span class="text-xs text-gray-400 font-medium">[Illustration: Applying Mortar]</span></div><div class="p-4 bg-white flex-1"><p class="text-[11px] leading-relaxed text-gray-700"><span class="font-bold text-[#006442] mr-1 prep-step-number">3.</span>Untuk tembok lembab, gunakan dahulu <span class="font-bold text-avian-primary">No Drop Mortar Anti Bocor</span> sebagai acian.</p></div></div>
+<div class="prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"><button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm"><span class="material-symbols-outlined text-base">delete</span></button><div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center"><span class="text-xs text-gray-400 font-medium">[Illustration: Cleaning Moss]</span></div><div class="p-4 bg-white flex-1"><p class="text-[11px] leading-relaxed text-gray-700"><span class="font-bold text-[#006442] mr-1 prep-step-number">4.</span>Bila permukaan tembok terdapat jamur dan lumut, basmi dengan menggunakan <span class="font-bold text-avian-primary">Avitex Biocidal Wash</span>, kemudian bersihkan.</p></div></div>
+<div class="prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"><button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm"><span class="material-symbols-outlined text-base">delete</span></button><div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center"><span class="text-xs text-gray-400 font-medium">[Illustration: Cleaning Surface]</span></div><div class="p-4 bg-white flex-1"><p class="text-[11px] leading-relaxed text-gray-700"><span class="font-bold text-[#006442] mr-1 prep-step-number">5.</span>Pastikan bahwa seluruh permukaan bersih, bebas dari debu, kotoran, minyak, dan tidak terkontaminasi bahan-bahan lainnya.</p></div></div>
+<div class="prep-card flex flex-col border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"><button onclick="removePrepCard(this)" class="absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full p-1 transition-colors shadow-sm"><span class="material-symbols-outlined text-base">delete</span></button><div class="h-44 bg-gray-50 flex items-center justify-center border-b border-gray-100 p-4 text-center"><span class="text-xs text-gray-400 font-medium">[Illustration: Fixing Cracks]</span></div><div class="p-4 bg-white flex-1"><p class="text-[11px] leading-relaxed text-gray-700"><span class="font-bold text-[#006442] mr-1 prep-step-number">6.</span>Untuk menutup retak yang kritis (sambungan) &lt; 2.0 mm lapiskan <span class="font-bold text-avian-primary">No Drop Anti Panas</span> diperkuat dengan serat fiber.</p></div></div>
+</div>
+</div>
+</section>
+<!-- END: PERSIAPAN PERMUKAAN -->
+
+<!-- BEGIN: CARA PEMAKAIAN -->
+<section class="bg-white rounded shadow-sm overflow-hidden border border-gray-200" data-purpose="section-cara-pemakaian">
+<div class="card-header-avian">CARA PEMAKAIAN</div>
+
+<style>
+  /* === OPSI B: TEMPLATE-FIRST === */
+  .tmpl-picker-wrap {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    padding: 20px 24px;
+    background: #f8faf9;
+    border-bottom: 1.5px solid #e5e7eb;
+  }
+  .tmpl-card {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    min-width: 140px;
+    text-align: center;
+  }
+  .tmpl-card:hover {
+    border-color: #006442;
+    background: #f0fdf4;
+    box-shadow: 0 2px 8px rgba(0,100,66,0.1);
+  }
+  .tmpl-card.active {
+    border-color: #006442;
+    background: #f0fdf4;
+    box-shadow: 0 0 0 3px #bbf7d0;
+  }
+  .tmpl-card-label { font-size: 12px; font-weight: 700; color: #111827; padding: 4px 2px; }
+
+  /* form area */
+  .tmpl-form-area { padding: 24px; }
+  .tmpl-form-area.hidden { display: none; }
+
+  /* step editor */
+  .tmpl-step-block {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #fff;
+  }
+  .tmpl-step-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: #f8faf9;
+    border-bottom: 1.5px solid #e5e7eb;
+  }
+  .tmpl-step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #006442; color: #fff;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .tmpl-step-title {
+    flex: 1; font-size: 12px; font-weight: 700; color: #111827;
+    border: none; background: transparent; outline: none;
+    border-bottom: 1.5px dashed transparent; padding: 1px 2px;
+  }
+  .tmpl-step-title:focus { border-bottom-color: #006442; }
+  .tmpl-step-tipe-badge {
+    font-size: 9px; font-weight: 700; padding: 2px 8px;
+    border-radius: 99px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .tmpl-step-body { padding: 14px 16px; }
+
+  /* editable fields inside steps */
+  .ef-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .ef-label { font-size: 10px; font-weight: 700; color: #6b7280; min-width: 90px; white-space: nowrap; }
+  .ef-input {
+    flex: 1; border: none; border-bottom: 1.5px solid #e5e7eb;
+    font-size: 12px; color: #374151; background: transparent;
+    outline: none; padding: 2px 0;
+  }
+  .ef-input:focus { border-bottom-color: #006442; }
+  .ef-del { background: none; border: none; cursor: pointer; color: #d1d5db; font-size: 14px; }
+  .ef-del:hover { color: #ef4444; }
+  .ef-add {
+    font-size: 10px; font-weight: 700; color: #006442;
+    background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; gap: 3px; padding: 2px 0; margin-top: 2px;
+  }
+  .ef-add:hover { text-decoration: underline; }
+
+  /* alat cat 3-col inside template */
+  .tmpl-alat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .tmpl-alat-col { display: flex; flex-direction: column; gap: 5px; }
+  .tmpl-alat-label { font-size: 10px; font-weight: 700; color: #6a1b9a; display: flex; align-items: center; gap: 4px; }
+  .tmpl-alat-input {
+    border: none; border-bottom: 1.5px solid #e5e7eb;
+    font-size: 12px; background: transparent; outline: none; padding: 2px 0; width: 100%;
+  }
+  .tmpl-alat-input:focus { border-bottom-color: #006442; }
+
+  /* sistem flow */
+  .tmpl-sistem-flow { display: flex; align-items: stretch; flex-wrap: wrap; gap: 0; }
+  .tmpl-sstep-wrap { display: flex; align-items: center; }
+  .tmpl-sstep {
+    border: 1.5px solid #b2dfdb; border-radius: 8px;
+    background: #f0fdf4; padding: 8px 12px;
+    min-width: 110px; max-width: 150px; position: relative;
+  }
+  .tmpl-sstep-num {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #006442; color: #fff;
+    font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 5px;
+  }
+  .tmpl-sstep input {
+    border: none; border-bottom: 1.5px solid #b2dfdb;
+    font-size: 10px; background: transparent; width: 100%; outline: none; padding: 2px 0; display: block; margin-bottom: 3px;
+  }
+  .tmpl-sstep input:focus { border-bottom-color: #006442; }
+  .tmpl-sstep-del {
+    position: absolute; top: 5px; right: 5px;
+    background: none; border: none; cursor: pointer;
+    font-size: 12px; color: #d1d5db;
+  }
+  .tmpl-sstep-del:hover { color: #ef4444; }
+  .tmpl-sarrow { width: 24px; text-align: center; color: #9ca3af; font-size: 16px; font-weight: 700; }
+  .tmpl-sadd { border: 1.5px dashed #9ca3af; border-radius: 8px; background: #f9fafb; padding: 6px 10px; font-size: 10px; font-weight: 600; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 3px; }
+  .tmpl-sadd:hover { border-color: #006442; color: #006442; }
+
+  /* perbandingan */
+  .tmpl-pb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .tmpl-pb-section-label { font-size: 10px; font-weight: 700; color: #880e4f; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .tmpl-pb-row { display: flex; align-items: center; gap: 6px; }
+  .tmpl-pb-input { flex: 1; border: none; border-bottom: 1.5px solid #e5e7eb; font-size: 11px; background: transparent; outline: none; padding: 2px 0; }
+  .tmpl-pb-input:focus { border-bottom-color: #006442; }
+  .tmpl-pb-unit { font-size: 9px; color: #9ca3af; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  .tmpl-pb-sep { color: #9ca3af; font-weight: 700; padding: 0 2px; }
+
+  /* add step btn */
+  .tmpl-add-step-btn {
+    display: flex; align-items: center; gap-6px;
+    font-size: 11px; font-weight: 700; color: #006442;
+    background: none; border: 1.5px dashed #86efac;
+    border-radius: 8px; cursor: pointer; padding: 8px 14px; width: 100%;
+    justify-content: center; margin-bottom: 8px;
+    transition: background 0.15s;
+  }
+  .tmpl-add-step-btn:hover { background: #f0fdf4; }
+
+  .airless-panel { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 14px 16px; }
+  .airless-grid { display: grid; grid-template-columns: 160px 1fr; gap: 5px 10px; font-size: 11px; }
+  .airless-key { font-weight: 600; color: #6b7280; display: flex; align-items: center; }
+  .airless-val { border: none; border-bottom: 1.5px solid #d1fae5; font-size: 11px; color: #374151; background: transparent; outline: none; width: 100%; padding: 1px 0; }
+  .airless-val:focus { border-bottom-color: #006442; }
+</style>
+
+<div>
+  <!-- STEP 1: Pilih Template -->
+  <div style="padding:14px 24px 8px; border-bottom: 1px solid #f3f4f6;">
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">① Pilih Template Produk</p>
+  </div>
+  <div class="tmpl-picker-wrap" id="tmpl-picker">
+    <div class="tmpl-card" onclick="tmplSelectCard(this,'solvent-based')" data-tmpl="solvent-based">
+      <div class="tmpl-card-label">Solvent Based</div>
+    </div>
+    <div class="tmpl-card" onclick="tmplSelectCard(this,'construction')" data-tmpl="construction">
+      <div class="tmpl-card-label">Construction</div>
+    </div>
+    <div class="tmpl-card" onclick="tmplSelectCard(this,'waterproofing')" data-tmpl="waterproofing">
+      <div class="tmpl-card-label">Waterproofing</div>
+    </div>
+    <div class="tmpl-card" onclick="tmplSelectCard(this,'water-based')" data-tmpl="water-based">
+      <div class="tmpl-card-label">Water Based</div>
+    </div>
+    <div class="tmpl-card tmpl-card-custom" onclick="tmplSelectCard(this,'custom')" data-tmpl="custom">
+      <div class="tmpl-card-label">Custom</div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Edit Form (pre-filled per template) -->
+  <div style="padding:10px 24px 6px; border-bottom: 1px solid #f3f4f6; margin-top:4px;">
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">② Edit Detail</p>
+  </div>
+  <div class="tmpl-form-area" id="tmpl-form-area">
+    <!-- Filled dynamically by JS -->
+  </div>
+
+  <!-- Panduan Airless -->
+  <div style="padding: 0 24px 24px;">
+    <div class="flex items-center justify-between mb-3">
+      <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Panduan Aplikasi Airless Spray</label>
+      <button id="panduan-toggle-btn" onclick="togglePanduanAplikasi()"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold border transition-all bg-[#f0f9f1] border-[#7fb582] text-[#006442] hover:bg-[#006442] hover:text-white">
+        <span class="material-symbols-outlined text-sm" id="panduan-toggle-icon">visibility</span>
+        <span id="panduan-toggle-label">Tampil di Dokumen</span>
+      </button>
+    </div>
+    <div id="panduan-aplikasi-box" class="airless-panel max-w-lg">
+      <div class="airless-grid">
+        <span class="airless-key">Nozzle tip</span><input class="airless-val" type="text" value='0.021–0.027"'/>
+        <span class="airless-key">Sudut Penyemprotan</span><input class="airless-val" type="text" value="65–80°"/>
+        <span class="airless-key">Tekanan pada nosel</span><input class="airless-val" type="text" value="140–190 kg/cm² (2100 psi)"/>
+      </div>
+    </div>
+    <p class="mt-2 text-[10px] text-gray-400 italic" id="panduan-hidden-note" style="display:none;">* Panduan aplikasi airless spray tidak akan ditampilkan di dokumen.</p>
+  </div>
+</div>
+
+<script>
+// ===== TEMPLATE DEFINITIONS =====
+const TEMPLATES = {
+  'cat-tembok': {
+    steps: [
+      { tipe: 'teks', title: 'Pastikan produk telah diaduk dan tercampur secara sempurna sebelum digunakan.', content: null },
+      { tipe: 'alat', title: 'Encerkan produk dengan air bersih', content: { kuas: 'Maksimum 10%', spray: 'Maksimum 30%', airless: '5–20% (tergantung alat)' } },
+      { tipe: 'sistem', title: 'Sistem pengecatan', content: [
+        { lapis: '1 lapis', produk: 'Lenkote Alkali Resisting Primer' },
+        { lapis: 'Jika dibutuhkan', produk: 'Lenkote Plamir Tembok' },
+        { lapis: '1 lapis', produk: 'Lenkote Alkali Resisting Primer' },
+        { lapis: '2 lapis', produk: 'Sunguard Cat Tembok' },
+      ]},
+      { tipe: 'bullet', title: 'Catatan Aplikasi', content: ['Pada saat aplikasi suhu bidang antara 10°C - 35°C dan minimal harus 3°C di atas suhu titik embun udara.', 'Pastikan sirkulasi udara di area pengecatan baik untuk pengeringan yang tepat.'] }
+    ]
+  },
+  'cat-besi': {
+    steps: [
+      { tipe: 'teks', title: 'Pastikan produk telah diaduk dan tercampur secara sempurna sebelum digunakan.', content: null },
+      { tipe: 'alat', title: 'Encerkan dengan Avia Thinner Enamel / Thinner B / Afduner', content: { kuas: 'Maksimum 5–10%', spray: 'Maksimum 50%', airless: '40–50% (tergantung alat)' } },
+      { tipe: 'sistem', title: 'Sistem pengecatan kayu', content: [
+        { lapis: '1 lapis', produk: 'Avian Loodmenie' },
+        { lapis: 'Jika dibutuhkan', produk: 'Avian Plamir/Wood Filler' },
+        { lapis: 'Jika dibutuhkan', produk: 'Avian Cat Kayu dan Besi Putih' },
+        { lapis: '2 lapis', produk: 'Avian Cat Kayu dan Besi' },
+      ]},
+      { tipe: 'sistem', title: 'Sistem pengecatan metal/besi', content: [
+        { lapis: '1 lapis', produk: 'Avian Zinc Chromate' },
+        { lapis: '2 lapis', produk: 'Avian Cat Kayu dan Besi' },
+      ]}
+    ]
+  },
+  'waterproofing': {
+    steps: [
+      { tipe: 'teks', title: 'Pastikan produk telah diaduk dan tercampur secara sempurna sebelum digunakan.', content: null },
+      { tipe: 'teks', title: 'Gunakan produk tanpa pengenceran untuk hasil anti panas yang maksimal.', content: null },
+      { tipe: 'bullet', title: 'Encerkan jika diperlukan dengan air bersih', content: ['10–20% untuk lapisan pertama', 'Tanpa pengencer untuk lapisan kedua dan ketiga'] },
+      { tipe: 'bullet', title: 'Catatan Aplikasi', content: ['Pada saat aplikasi suhu bidang antara 10°C - 35°C.', 'Pastikan sirkulasi udara di area pengecatan baik.'] }
+    ]
+  },
+  'mortar': {
+    steps: [
+      { tipe: 'numbering', title: 'Cara Pencampuran', content: ['Tuang air bersih ke dalam wadah pengadukan kemudian masukan produk secara perlahan.', 'Aduk campuran hingga rata menggunakan hand mixer (dapat menggunakan sekop ataupun sendok semen).', 'Aplikasikan campuran dengan menggunakan roskam bergerigi, tebal aplikasi yang disarankan adalah + 3.0 mm.'] },
+      { tipe: 'perbandingan', title: 'Perbandingan Campuran', content: { volumeAir: '1', volumeProduk: '± 2,5', beratAir: '1 liter', beratProduk: '± 4 kg', altAir: '10 liter', altProduk: '40 kg' } }
+    ]
+  },
+  'custom': { steps: [] }
+};
+
+let stepCounter = 0;
+
+function tmplSelect(card, tmplKey) {
+  document.querySelectorAll('.tmpl-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  renderForm(TEMPLATES[tmplKey].steps);
+}
+
+function renderForm(steps) {
+  const area = document.getElementById('tmpl-form-area');
+  area.innerHTML = '';
+  steps.forEach((s, i) => renderStep(s, i, area));
+  renderAddStepBar(area);
+}
+
+function renderStep(step, idx, container) {
+  const block = document.createElement('div');
+  block.className = 'tmpl-step-block';
+  block.dataset.stepIdx = idx;
+
+  const tipeColors = { teks:'#e8f5e9/#2e7d32', bullet:'#e3f2fd/#1565c0', numbering:'#fff3e0/#e65100', alat:'#f3e5f5/#6a1b9a', perbandingan:'#fce4ec/#880e4f', sistem:'#e0f7fa/#006064' };
+  const tipeLabel = { teks:'Teks', bullet:'Bullet Points', numbering:'Numbering', alat:'Alat Cat', perbandingan:'Perbandingan Air', sistem:'Sistem Pengecatan' };
+  const [bg, color] = (tipeColors[step.tipe] || '#f3f4f6/#374151').split('/');
+
+  block.innerHTML = `
+    <div class="tmpl-step-header">
+      <div class="tmpl-step-num">${idx + 1}</div>
+      <input class="tmpl-step-title" type="text" value="${step.title || ''}" placeholder="Judul poin..."/>
+      <span class="tmpl-step-tipe-badge" style="background:${bg};color:${color}">${tipeLabel[step.tipe]}</span>
+      <button style="background:none;border:none;cursor:pointer;color:#d1d5db;margin-left:8px;font-size:18px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'" onclick="this.closest('.tmpl-step-block').remove();renumberSteps()">
+        <span class="material-symbols-outlined text-base">delete</span>
+      </button>
+    </div>
+    <div class="tmpl-step-body">${buildStepBody(step)}</div>
+  `;
+
+  if (container.id === 'tmpl-form-area') {
+    container.appendChild(block);
+  } else {
+    container.insertBefore(block, container.lastElementChild);
+  }
+}
+
+function buildStepBody(step) {
+  if (step.tipe === 'teks') return '<p class="text-[11px] text-gray-400 italic">— poin teks, tidak ada sub-poin —</p>';
+
+  if (step.tipe === 'bullet' || step.tipe === 'numbering') {
+    const items = (step.content || []).map((t, i) => {
+      const label = step.tipe === 'numbering' ? (i+1)+'.' : '•';
+      return `<div class="ef-row"><span class="ef-label" style="min-width:24px;font-weight:700;color:${step.tipe==='numbering'?'#e65100':'#006442'}">${label}</span><input class="ef-input" type="text" value="${t}"/><button class="ef-del" onclick="this.closest('.ef-row').remove()">×</button></div>`;
+    }).join('');
+    return items + `<button class="ef-add" onclick="tmplAddItem(this,'${step.tipe}')"><span class="material-symbols-outlined text-xs">add_circle</span> Tambah item</button>`;
+  }
+
+  if (step.tipe === 'alat') {
+    const c = step.content || {};
+    return `<div class="tmpl-alat-grid">
+      <div class="tmpl-alat-col"><div class="tmpl-alat-label"><span class="material-symbols-outlined text-sm">brush</span> Kuas / Roll</div><input class="tmpl-alat-input" type="text" placeholder="%" value="${c.kuas||''}"/><input class="tmpl-alat-input" type="text" placeholder="Keterangan..." value="aplikasi menggunakan kuas atau roll"/></div>
+      <div class="tmpl-alat-col"><div class="tmpl-alat-label"><span class="material-symbols-outlined text-sm">air</span> Spray</div><input class="tmpl-alat-input" type="text" placeholder="%" value="${c.spray||''}"/><input class="tmpl-alat-input" type="text" placeholder="Keterangan..." value="aplikasi menggunakan spray"/></div>
+      <div class="tmpl-alat-col"><div class="tmpl-alat-label"><span class="material-symbols-outlined text-sm">water_pump</span> Airless Spray</div><input class="tmpl-alat-input" type="text" placeholder="%" value="${c.airless||''}"/><input class="tmpl-alat-input" type="text" placeholder="Keterangan..." value="tergantung alat"/></div>
+    </div>`;
+  }
+
+  if (step.tipe === 'perbandingan') {
+    const c = step.content || {};
+    return `<div class="tmpl-pb-grid">
+      <div><div class="tmpl-pb-section-label">a. Perbandingan Volume</div>
+        <div class="tmpl-pb-row"><input class="tmpl-pb-input" type="text" placeholder="Air..." value="${c.volumeAir||''}"/><span class="tmpl-pb-sep">:</span><input class="tmpl-pb-input" type="text" placeholder="Produk..." value="${c.volumeProduk||''}"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:3px;"><div class="tmpl-pb-unit">air bersih</div><div class="tmpl-pb-unit">produk</div></div>
+      </div>
+      <div><div class="tmpl-pb-section-label">b. Perbandingan Berat</div>
+        <div class="tmpl-pb-row"><input class="tmpl-pb-input" type="text" placeholder="Liter air..." value="${c.beratAir||''}"/><span class="tmpl-pb-sep">:</span><input class="tmpl-pb-input" type="text" placeholder="Kg produk..." value="${c.beratProduk||''}"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:3px;"><div class="tmpl-pb-unit">liter air</div><div class="tmpl-pb-unit">kg produk</div></div>
+      </div>
+      <div><div class="tmpl-pb-section-label">c. Alternatif</div>
+        <div class="tmpl-pb-row"><input class="tmpl-pb-input" type="text" placeholder="Liter air..." value="${c.altAir||''}"/><span class="tmpl-pb-sep">:</span><input class="tmpl-pb-input" type="text" placeholder="Kg produk..." value="${c.altProduk||''}"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:3px;"><div class="tmpl-pb-unit">liter air</div><div class="tmpl-pb-unit">kg produk</div></div>
+      </div>
+    </div>`;
+  }
+
+  if (step.tipe === 'sistem') {
+    const steps = (step.content || []).map((s, i) => `
+      <div class="tmpl-sstep-wrap">
+        <div class="tmpl-sstep">
+          <div class="tmpl-sstep-num">${i+1}</div>
+          <input type="text" placeholder="Jml. lapis..." value="${s.lapis||''}"/>
+          <input type="text" placeholder="Nama produk..." value="${s.produk||''}"/>
+          <button class="tmpl-sstep-del" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'" onclick="tmplSistemRemove(this)">✕</button>
+        </div>
+      </div>
+      ${i < (step.content.length-1) ? '<div class="tmpl-sstep-wrap"><span class="tmpl-sarrow">›</span></div>' : ''}
+    `).join('');
+    return `<div class="tmpl-sistem-flow" data-sistem>${steps}</div>
+      <button class="tmpl-sadd mt-3" onclick="tmplSistemAdd(this)"><span class="material-symbols-outlined text-sm">add</span> Tambah Langkah</button>`;
+  }
+  return '';
+}
+
+function renderAddStepBar(area) {
+  const bar = document.createElement('div');
+  bar.className = 'flex flex-wrap gap-2 mt-2 mb-4';
+  bar.id = 'tmpl-add-bar';
+  const types = ['teks','bullet','numbering','alat','perbandingan','sistem'];
+  const labels = ['Teks','Bullet Points','Numbering','Alat Cat','Perbandingan Air','Sistem Pengecatan'];
+  const colors = ['#e8f5e9/#2e7d32','#e3f2fd/#1565c0','#fff3e0/#e65100','#f3e5f5/#6a1b9a','#fce4ec/#880e4f','#e0f7fa/#006064'];
+  bar.innerHTML = '<span style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.06em;display:flex;align-items:center;margin-right:4px;">+ Tambah:</span>' +
+    types.map((t,i) => {
+      const [bg,col] = colors[i].split('/');
+      return `<button onclick="tmplAddStep('${t}')" style="font-size:9px;font-weight:700;padding:3px 10px;border-radius:99px;background:${bg};color:${col};border:none;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;">${labels[i]}</button>`;
+    }).join('');
+  area.appendChild(bar);
+}
+
+function tmplAddStep(tipe) {
+  const area = document.getElementById('tmpl-form-area');
+  const blocks = area.querySelectorAll('.tmpl-step-block');
+  const idx = blocks.length;
+  const step = { tipe, title: '', content: tipe === 'sistem' ? [] : tipe === 'alat' ? {} : tipe === 'perbandingan' ? {} : tipe === 'bullet' || tipe === 'numbering' ? [] : null };
+  renderStep(step, idx, area);
+  renumberSteps();
+}
+
+function renumberSteps() {
+  document.querySelectorAll('.tmpl-step-block').forEach((b, i) => {
+    const num = b.querySelector('.tmpl-step-num');
+    if (num) num.textContent = i + 1;
+  });
+}
+
+function tmplAddItem(btn, tipe) {
+  const body = btn.closest('.tmpl-step-body');
+  const items = body.querySelectorAll('.ef-row');
+  const label = tipe === 'numbering' ? (items.length+1)+'.' : '•';
+  const color = tipe === 'numbering' ? '#e65100' : '#006442';
+  const row = document.createElement('div');
+  row.className = 'ef-row';
+  row.innerHTML = `<span class="ef-label" style="min-width:24px;font-weight:700;color:${color}">${label}</span><input class="ef-input" type="text" placeholder="Isi item..."/><button class="ef-del" onclick="this.closest('.ef-row').remove()">×</button>`;
+  body.insertBefore(row, btn);
+}
+
+function tmplSistemAdd(btn) {
+  const flow = btn.previousElementSibling;
+  const steps = flow.querySelectorAll('.tmpl-sstep');
+  const newNum = steps.length + 1;
+  if (steps.length > 0) {
+    const arrowWrap = document.createElement('div');
+    arrowWrap.className = 'tmpl-sstep-wrap';
+    arrowWrap.innerHTML = '<span class="tmpl-sarrow">›</span>';
+    flow.appendChild(arrowWrap);
+  }
+  const wrap = document.createElement('div');
+  wrap.className = 'tmpl-sstep-wrap';
+  wrap.innerHTML = `<div class="tmpl-sstep"><div class="tmpl-sstep-num">${newNum}</div><input type="text" placeholder="Jml. lapis..."/><input type="text" placeholder="Nama produk..."/><button class="tmpl-sstep-del" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'" onclick="tmplSistemRemove(this)">✕</button></div>`;
+  flow.appendChild(wrap);
+  renumberSistemSteps(flow);
+}
+
+function tmplSistemRemove(btn) {
+  const stepWrap = btn.closest('.tmpl-sstep-wrap');
+  const flow = stepWrap.closest('[data-sistem]');
+  const all = Array.from(flow.children);
+  const idx = all.indexOf(stepWrap);
+  if (idx > 0 && all[idx-1].querySelector('.tmpl-sarrow')) flow.removeChild(all[idx-1]);
+  else if (idx < all.length-1 && all[idx+1] && all[idx+1].querySelector('.tmpl-sarrow')) flow.removeChild(all[idx+1]);
+  flow.removeChild(stepWrap);
+  renumberSistemSteps(flow);
+}
+
+function renumberSistemSteps(flow) {
+  flow.querySelectorAll('.tmpl-sstep-num').forEach((el, i) => el.textContent = i+1);
+}
+
+// ===== PANDUAN TOGGLE =====
+let panduanVisible = true;
+function togglePanduanAplikasi() {
+  panduanVisible = !panduanVisible;
+  const box = document.getElementById('panduan-aplikasi-box');
+  const icon = document.getElementById('panduan-toggle-icon');
+  const label = document.getElementById('panduan-toggle-label');
+  const note = document.getElementById('panduan-hidden-note');
+  const btn = document.getElementById('panduan-toggle-btn');
+  if (panduanVisible) {
+    box.style.display=''; box.style.opacity='1';
+    icon.textContent='visibility'; label.textContent='Tampil di Dokumen';
+    note.style.display='none';
+    btn.classList.remove('bg-gray-100','border-gray-300','text-gray-400');
+    btn.classList.add('bg-[#f0f9f1]','border-[#7fb582]','text-[#006442]');
+  } else {
+    box.style.opacity='0.35'; icon.textContent='visibility_off';
+    label.textContent='Disembunyikan'; note.style.display='';
+    btn.classList.remove('bg-[#f0f9f1]','border-[#7fb582]','text-[#006442]');
+    btn.classList.add('bg-gray-100','border-gray-300','text-gray-400');
+  }
+}
+
+// Remap TEMPLATES to new kategori keys
+TEMPLATES['solvent-based'] = TEMPLATES['cat-besi'];
+TEMPLATES['construction'] = TEMPLATES['mortar'];
+TEMPLATES['water-based'] = TEMPLATES['cat-tembok'];
+// waterproofing key stays the same
+
+// Kategori -> template mapping
+const KATEGORI_TO_TMPL = {
+  'solvent-based': 'solvent-based',
+  'construction': 'construction',
+  'waterproofing': 'waterproofing',
+  'water-based': 'water-based'
+};
+
+function onKategoriChange(val) {
+  if (!val) return;
+  const tmplKey = KATEGORI_TO_TMPL[val];
+  if (!tmplKey) return;
+  // Activate the matching card, grey out others (except custom)
+  document.querySelectorAll('.tmpl-card').forEach(c => {
+    const isCustom = c.dataset.tmpl === 'custom';
+    const isMatch = c.dataset.tmpl === tmplKey;
+    c.classList.remove('active');
+    if (isMatch) {
+      c.classList.add('active');
+      c.style.opacity = '1';
+      c.style.pointerEvents = 'auto';
+    } else if (isCustom) {
+      c.style.opacity = '1';
+      c.style.pointerEvents = 'auto';
+    } else {
+      c.style.opacity = '0.35';
+      c.style.pointerEvents = 'none';
+    }
+  });
+  renderForm(TEMPLATES[tmplKey].steps);
+}
+
+function tmplSelectCard(card, tmplKey) {
+  // Only allow clicking if not greyed out (custom always allowed)
+  document.querySelectorAll('.tmpl-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  renderForm(TEMPLATES[tmplKey].steps);
+}
+
+// Override old tmplSelect
+function tmplSelect(card, tmplKey) { tmplSelectCard(card, tmplKey); }
+
+// Init: no template selected by default — wait for kategori dropdown
+// but show empty form
+renderForm([]);
+</script>
+
+</section>
+<!-- END: CARA PEMAKAIAN -->
+
+<!-- ============================================================ -->
+<!-- BEGIN: PIKTOGRAM (standalone section) -->
+<!-- ============================================================ -->
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden" data-purpose="section-piktogram">
+<div class="card-header-avian">PIKTOGRAM</div>
+<div class="p-6">
+<label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">Pilih Piktogram</label>
+<select class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary">
+<option value="">Pilih Piktogram...</option>
+<option>Iritan</option>
+<option>Mudah terbakar</option>
+<option>Bahaya kesehatan serius</option>
+<option>Berbahaya bagi lingkungan</option>
+</select>
+</div>
+</section>
+<!-- END: PIKTOGRAM -->
+
+<!-- BEGIN: PEMBERSIHAN & PENYIMPANAN -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- PEMBERSIHAN PERALATAN (Piktogram sudah dipindah ke atas) -->
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+<div class="card-header-avian">PEMBERSIHAN PERALATAN</div>
+<div class="p-6 space-y-6">
+<div>
+<label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">Petunjuk Pembersihan</label>
+<textarea class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary" placeholder="Masukkan petunjuk pembersihan..." rows="4">Segera cuci semua peralatan aplikasi dengan air bersih setelah digunakan.</textarea>
+</div>
+</div>
+</section>
+<!-- SISTEM PENYIMPANAN -->
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+<div class="card-header-avian"><span>SISTEM PENYIMPANAN</span><button class="w-8 h-8 flex items-center justify-center bg-white/20 rounded hover:bg-white/40" onclick="addStorageRow()">+</button></div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="bg-gray-50 text-[10px] uppercase text-gray-500 font-bold border-b"><tr><th class="px-6 py-3 w-16">No</th><th class="px-6 py-3">Storage Instruction</th><th class="px-6 py-3 w-24 text-center">Action</th></tr></thead>
+<tbody class="divide-y" id="storage-table-body">
+<tr><td class="px-6 py-4 row-no">1</td><td class="px-6 py-4"><input class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" type="text" value="Simpan dalam wadah tertutup rapat"/></td><td class="px-6 py-4 text-center"><button class="text-red-500 hover:text-red-700" onclick="removeStorageRow(this)"><span class="material-symbols-outlined text-lg">delete</span></button></td></tr>
+<tr><td class="px-6 py-4 row-no">2</td><td class="px-6 py-4"><input class="w-full border-0 border-b border-gray-200 focus:ring-0 focus:border-avian-primary p-0 text-sm bg-transparent" type="text" value="Simpan di tempat sejuk dan kering"/></td><td class="px-6 py-4 text-center"><button class="text-red-500 hover:text-red-700" onclick="removeStorageRow(this)"><span class="material-symbols-outlined text-lg">delete</span></button></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- END: PEMBERSIHAN & PENYIMPANAN -->
+
+<!-- BEGIN: READ ONLY CARDS -->
+<div class="grid grid-cols-1 gap-8">
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+<div class="bg-avian-primary text-white px-5 py-3 font-bold uppercase text-sm tracking-wide">PEMBERITAHUAN TAMBAHAN</div>
+<div class="p-6 space-y-4">
+<div class="border border-gray-100 bg-gray-50/30 rounded-lg p-6">
+<p class="text-xs text-gray-700 italic leading-relaxed font-medium">Informasi yang ada di dalam Lembar Data Teknis ini dibuat berdasarkan pengetahuan kami saat ini dan berdasarkan hasil pengujian di Laboratorium. Pihak pemakai disarankan untuk menghubungi pihak produsen untuk kecocokan dan kebutuhan jenis produk yang akan digunakan.</p>
+</div>
+<p class="text-[10px] text-gray-400 font-medium">* This text is standard legal disclaimer and is read-only.</p>
+</div>
+</section>
+<section class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+<div class="bg-avian-primary text-white px-5 py-3 font-bold text-sm tracking-wide">Informasi Keselamatan, Keamanan, Kesehatan dan Lingkungan Hidup</div>
+<div class="p-8 bg-avian-primary">
+<div class="flex items-center gap-3 text-white">
+<span class="material-symbols-outlined text-2xl">info</span>
+<p class="text-sm font-bold italic">Lembar data keselamatan dapat diunduh di <a class="underline" href="http://www.avianbrands.com">www.avianbrands.com</a></p>
+</div>
+</div>
+</section>
+</div>
+<!-- END: READ ONLY CARDS -->
+
+<div class="h-16"></div>
+</div>
+<!-- END: Content Scrollable -->
+
+<!-- BEGIN: Bottom Action Bar -->
+<footer class="h-20 bg-white border-t border-gray-200 px-8 flex items-center justify-between shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] sticky bottom-0 z-50">
+<div class="flex items-center gap-2 text-xs text-gray-500">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+Last saved at 14:32
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 border border-gray-300 rounded text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>SIMPAN KONSEP</button>
+<button class="px-6 py-2 border border-avian-primary rounded text-sm font-bold text-avian-primary hover:bg-avian-primary/5 transition-colors flex items-center">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>GENERATE PDF</button>
+<button onclick="onTdsFormSave()" class="px-10 py-2 bg-avian-primary text-white rounded text-sm font-bold hover:bg-avian-dark transition-colors shadow-md flex items-center">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>SUBMIT</button>
+</div>
+</footer>
+<!-- END: Bottom Action Bar -->
+</div><!-- end form-view --></main>
+</div>
+</body></html>
