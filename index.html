@@ -405,9 +405,13 @@ function toggleSpecCard(specId, isChecked) {
 <a class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors" href="#">
 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Dashboard</a>
 <a id="nav-product-master" class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer" onclick="navigateTo('product-master')">
-<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Product Master</a>
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Database Produk</a>
 <a id="nav-list-tds" class="flex items-center px-6 py-3 sidebar-item-active cursor-pointer" onclick="navigateTo('list-tds')">
 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>List TDS</a>
+<a id="nav-list-tds2" class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer" onclick="navigateTo('list-tds2')">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>List TDS 2</a>
+<a id="nav-list-tds3" class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors cursor-pointer" onclick="navigateTo('list-tds3')">
+<svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>List TDS 3</a>
 <div class="px-4 py-2 mt-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Master</div>
 <a class="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors" href="#">
 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>Asset Library</a>
@@ -612,7 +616,7 @@ function toggleSpecCard(specId, isChecked) {
       <table class="dt-table" id="tds-main-table">
         <thead>
           <tr>
-            <th style="width:44px;"></th>
+            <th style="width:90px;">Aksi</th>
             <th onclick="sortTds('tanggal')">Tanggal ↕</th>
             <th onclick="sortTds('noForm')">No Form ↕</th>
             <th onclick="sortTds('nama')">Nama Produk ↕</th>
@@ -637,16 +641,190 @@ function toggleSpecCard(specId, isChecked) {
   </div>
 </div>
 
+<!-- ==================== LIST TDS 2 VIEW ==================== -->
+<div id="list-tds2-view" class="page-view" style="padding: 20px 24px; overflow-x: hidden; min-width: 0;">
+
+  <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:20px;">List TDS 2</h2>
+
+  <div class="dt-wrapper">
+    <!-- topbar -->
+    <div class="dt-topbar">
+      <span style="font-size:13px;font-weight:700;color:#374151;">List TDS 2</span>
+      <div class="dt-topbar-right">
+        <button class="dt-btn" onclick="toggleTds2Filter()">
+          <span class="material-symbols-outlined" style="font-size:15px;">filter_list</span> Filter
+        </button>
+        <button class="dt-btn" onclick="reloadTds2Table()">
+          <span class="material-symbols-outlined" style="font-size:15px;">refresh</span> Reload
+        </button>
+        <button class="dt-btn dt-btn-primary" onclick="openTdsForm('new')">
+          <span class="material-symbols-outlined" style="font-size:15px;">add</span> Add
+        </button>
+      </div>
+    </div>
+
+    <!-- filter panel -->
+    <div class="dt-filter-panel" id="tds2-filter-panel">
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Nama Produk</label>
+        <input class="dt-filter-input" id="t2f-nama" type="text" placeholder="Cari..." oninput="applyTds2Filters()"/>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Kategori</label>
+        <select class="dt-filter-select" id="t2f-kategori" onchange="applyTds2Filters()">
+          <option value="">Semua</option>
+          <option>Solvent Based</option>
+          <option>Construction</option>
+          <option>Waterproofing</option>
+          <option>Water Based</option>
+        </select>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Last Edit (Dari)</label>
+        <input class="dt-filter-input" id="t2f-date-from" type="date" onchange="applyTds2Filters()"/>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Last Edit (Sampai)</label>
+        <input class="dt-filter-input" id="t2f-date-to" type="date" onchange="applyTds2Filters()"/>
+      </div>
+      <button class="dt-reset-btn" onclick="resetTds2Filters()">
+        <span class="material-symbols-outlined" style="font-size:14px;">refresh</span> Reset
+      </button>
+    </div>
+
+    <!-- show entries + search -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;gap:8px;">
+      <div class="dt-topbar-left">
+        Show <select class="dt-show-select" id="tds2-show-count" onchange="applyTds2Filters()">
+          <option>10</option><option>25</option><option>50</option>
+        </select> entries
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;">
+        Search: <input class="dt-search-input" id="tds2-search" type="text" oninput="applyTds2Filters()"/>
+      </div>
+    </div>
+
+    <!-- table -->
+    <div style="overflow-x:auto; width:100%; -webkit-overflow-scrolling:touch;">
+      <table class="dt-table" id="tds2-main-table">
+        <thead>
+          <tr>
+            <th style="width:80px;">Aksi</th>
+            <th onclick="sortTds2('tanggal')">Tanggal ↕</th>
+            <th onclick="sortTds2('noForm')">No Form ↕</th>
+            <th onclick="sortTds2('nama')">Nama Produk ↕</th>
+            <th style="min-width:130px;">Versi</th>
+            <th>PDF</th>
+            <th onclick="sortTds2('lastEdit')">Last Edit ↕</th>
+            <th>Approval RDI</th>
+            <th>Approval RDI Director</th>
+            <th>Approval Marketing Manager</th>
+            <th>Approval Marketing Director</th>
+          </tr>
+        </thead>
+        <tbody id="tds2-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- footer pagination -->
+    <div class="dt-footer">
+      <span id="tds2-info-label">Showing 0 to 0 of 0 entries</span>
+      <div class="dt-pagination" id="tds2-pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LIST TDS 3 VIEW ==================== -->
+<div id="list-tds3-view" class="page-view" style="padding: 20px 24px; overflow-x: hidden; min-width: 0;">
+
+  <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:4px;">List TDS 3</h2>
+  <p style="font-size:12px;color:#6b7280;margin-bottom:20px;">Versi dropdown langsung membuka PDF di tab baru. Data di bawah adalah contoh/lorem ipsum.</p>
+
+  <div class="dt-wrapper">
+    <div class="dt-topbar">
+      <span style="font-size:13px;font-weight:700;color:#374151;">List TDS 3</span>
+      <div class="dt-topbar-right">
+        <button class="dt-btn" onclick="toggleTds3Filter()">
+          <span class="material-symbols-outlined" style="font-size:15px;">filter_list</span> Filter
+        </button>
+        <button class="dt-btn" onclick="reloadTds3Table()">
+          <span class="material-symbols-outlined" style="font-size:15px;">refresh</span> Reload
+        </button>
+        <button class="dt-btn dt-btn-primary" onclick="openTdsForm('new')">
+          <span class="material-symbols-outlined" style="font-size:15px;">add</span> Add
+        </button>
+      </div>
+    </div>
+
+    <div class="dt-filter-panel" id="tds3-filter-panel">
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Nama Produk</label>
+        <input class="dt-filter-input" id="t3f-nama" type="text" placeholder="Cari..." oninput="applyTds3Filters()"/>
+      </div>
+      <div class="dt-filter-field">
+        <label class="dt-filter-label">Kategori</label>
+        <select class="dt-filter-select" id="t3f-kategori" onchange="applyTds3Filters()">
+          <option value="">Semua</option>
+          <option>Solvent Based</option>
+          <option>Construction</option>
+          <option>Waterproofing</option>
+          <option>Water Based</option>
+        </select>
+      </div>
+      <button class="dt-reset-btn" onclick="resetTds3Filters()">
+        <span class="material-symbols-outlined" style="font-size:14px;">refresh</span> Reset
+      </button>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;gap:8px;">
+      <div class="dt-topbar-left">
+        Show <select class="dt-show-select" id="tds3-show-count" onchange="applyTds3Filters()">
+          <option>10</option><option>25</option><option>50</option>
+        </select> entries
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;">
+        Search: <input class="dt-search-input" id="tds3-search" type="text" oninput="applyTds3Filters()"/>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto; width:100%; -webkit-overflow-scrolling:touch;">
+      <table class="dt-table" id="tds3-main-table">
+        <thead>
+          <tr>
+            <th style="width:80px;">Aksi</th>
+            <th>Tanggal</th>
+            <th>No Form</th>
+            <th>Nama Produk</th>
+            <th style="min-width:110px;">Versi</th>
+            <th>PDF</th>
+            <th>Last Edit</th>
+            <th>Approval RDI</th>
+            <th>Approval RDI Director</th>
+            <th>Approval Mkt. Manager</th>
+            <th>Approval Mkt. Director</th>
+          </tr>
+        </thead>
+        <tbody id="tds3-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="dt-footer">
+      <span id="tds3-info-label">Showing 0 to 0 of 0 entries</span>
+      <div class="dt-pagination" id="tds3-pagination"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== PRODUCT MASTER LIST VIEW ==================== -->
 <div id="product-master-view" class="page-view" style="padding: 20px 24px; overflow-x: hidden; min-width: 0;">
 
   <!-- List table (default shown) -->
   <div id="pm-list-section">
-    <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:20px;">Product Master</h2>
+    <h2 style="font-size:20px;font-weight:800;color:#111827;margin-bottom:20px;">Database Produk</h2>
 
     <div class="dt-wrapper">
       <div class="dt-topbar">
-        <span style="font-size:13px;font-weight:700;color:#374151;">List Product Master</span>
+        <span style="font-size:13px;font-weight:700;color:#374151;">List Database Produk</span>
         <div class="dt-topbar-right">
           <button class="dt-btn" onclick="togglePmFilter()">
             <span class="material-symbols-outlined" style="font-size:15px;">filter_list</span> Filter
@@ -718,7 +896,7 @@ function toggleSpecCard(specId, isChecked) {
       <button onclick="closePmView()" class="dt-btn">
         <span class="material-symbols-outlined" style="font-size:15px;">arrow_back</span> Kembali
       </button>
-      <h2 style="font-size:20px;font-weight:800;color:#111827;">Detail Product Master</h2>
+      <h2 style="font-size:20px;font-weight:800;color:#111827;">Detail Database Produk</h2>
     </div>
 
     <!-- Header Card (Name, Image, Category, Description) -->
@@ -766,7 +944,7 @@ function toggleSpecCard(specId, isChecked) {
       <button onclick="closePmEdit()" class="dt-btn">
         <span class="material-symbols-outlined" style="font-size:15px;">arrow_back</span> Kembali
       </button>
-      <h2 id="pm-edit-title" style="font-size:20px;font-weight:800;color:#111827;">Edit Product Master</h2>
+      <h2 id="pm-edit-title" style="font-size:20px;font-weight:800;color:#111827;">Edit Database Produk</h2>
     </div>
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" style="background: #fff;">
@@ -919,7 +1097,7 @@ syncPmFromTds();
 // ================================================================
 function navigateTo(page) {
   // hide all views
-  ['list-tds-view','product-master-view'].forEach(id => {
+  ['list-tds-view','list-tds2-view','list-tds3-view','product-master-view'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
@@ -937,6 +1115,14 @@ function navigateTo(page) {
     document.getElementById('list-tds-view').classList.add('active');
     document.getElementById('nav-list-tds').classList.add('sidebar-item-active');
     applyTdsFilters();
+  } else if (page === 'list-tds2') {
+    document.getElementById('list-tds2-view').classList.add('active');
+    document.getElementById('nav-list-tds2').classList.add('sidebar-item-active');
+    applyTds2Filters();
+  } else if (page === 'list-tds3') {
+    document.getElementById('list-tds3-view').classList.add('active');
+    document.getElementById('nav-list-tds3').classList.add('sidebar-item-active');
+    renderTds3Table();
   } else if (page === 'product-master') {
     document.getElementById('product-master-view').classList.add('active');
     document.getElementById('nav-product-master').classList.add('sidebar-item-active');
@@ -1004,58 +1190,168 @@ function sortTds(key) {
   renderTdsTable();
 }
 
+const expandedProducts = new Set();
+function toggleProductExpand(productName) {
+  if (expandedProducts.has(productName)) {
+    expandedProducts.delete(productName);
+  } else {
+    expandedProducts.add(productName);
+  }
+  renderTdsTable();
+}
+
 function renderTdsTable() {
   const tbody = document.getElementById('tds-tbody');
+  
+  // Group tdsFiltered by product name
+  const groups = {};
+  tdsFiltered.forEach(r => {
+    if (!groups[r.nama]) {
+      groups[r.nama] = [];
+    }
+    groups[r.nama].push(r);
+  });
+  
+  // Sort each group by version descending and find the latest (parent) and older (children)
+  const groupedData = [];
+  Object.keys(groups).forEach(name => {
+    const list = groups[name];
+    list.sort((a, b) => b.versi - a.versi);
+    groupedData.push({
+      parent: list[0],
+      children: list.slice(1)
+    });
+  });
+  
+  // Sort groupedData based on parent properties using tdsSortKey
+  if (tdsSortKey) {
+    groupedData.sort((a, b) => {
+      let av = a.parent[tdsSortKey] || '', bv = b.parent[tdsSortKey] || '';
+      if (tdsSortKey === 'versi') { av = Number(av); bv = Number(bv); }
+      return (av < bv ? -1 : av > bv ? 1 : 0) * (tdsSortAsc ? 1 : -1);
+    });
+  }
+  
   const showN = parseInt(document.getElementById('tds-show-count')?.value || 10);
   const start = (tdsPage - 1) * showN;
-  const pageData = tdsFiltered.slice(start, start + showN);
-  const totalPages = Math.ceil(tdsFiltered.length / showN);
-
-  if (!pageData.length) {
+  const pageGroups = groupedData.slice(start, start + showN);
+  const totalPages = Math.ceil(groupedData.length / showN);
+  
+  if (!pageGroups.length) {
     tbody.innerHTML = '<tr class="dt-empty"><td colspan="11">Tidak ada data.</td></tr>';
   } else {
-    tbody.innerHTML = pageData.map(r => {
-      const pdfBtns = (r.pdf||[]).map(lang =>
-        `<button class="pdf-badge pdf-${lang.toLowerCase()}">${lang}</button>`).join('');
-      const approvalCell = (key, label) => {
+    let tbodyHtml = '';
+    pageGroups.forEach(g => {
+      const r = g.parent;
+      const children = g.children;
+      const isExpanded = expandedProducts.has(r.nama);
+      
+      const pdfLangs = (r.pdf && r.pdf.length > 0) ? r.pdf : [];
+      const pdfBtns = `<button class="pdf-badge pdf-id" title="Buka PDF ID" onclick="openTdsPdf(${r.id},'ID')" style="cursor:pointer;">ID</button>` +
+        pdfLangs.filter(l=>l!=='ID').map(lang =>
+          `<button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="openTdsPdf(${r.id},'${lang}')" style="cursor:pointer;">${lang}</button>`).join('');
+        
+      const approvalCell = (key) => {
         const a = r.approvals[key];
         if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
         return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove(${r.id},'${key}')">Approve</button></td>`;
       };
-      return `<tr>
+      
+      // Check if all approvals are done for the parent
+      const isApproved = r.approvals.rdi && r.approvals.rdiDir && r.approvals.mktMgr && r.approvals.mktDir;
+      const editBtnHtml = isApproved ? '' : `<button class="dt-action-btn btn-blue" title="Edit" onclick="openTdsForm('edit',${r.id})">
+        <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
+      </button>`;
+      const deleteBtnHtml = `<button class="dt-action-btn btn-red" title="Hapus" onclick="openDeleteModal('tds',${r.id})">
+        <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+      </button>`;
+      
+      // Expand toggle button
+      const expandBtnHtml = children.length > 0 
+        ? `<button class="expand-toggle-btn" onclick="toggleProductExpand('${r.nama.replace(/'/g, "\\'")}')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4b5563;padding:2px;border-radius:4px;margin-right:2px;" title="${isExpanded ? 'Collapse' : 'Expand'}">
+            <span class="material-symbols-outlined" style="font-size:18px;transition:transform 0.2s;${isExpanded ? 'transform:rotate(90deg);' : ''}">chevron_right</span>
+           </button>`
+        : `<div style="width:22px;margin-right:2px;flex-shrink:0;"></div>`;
+        
+      // Render parent row
+      tbodyHtml += `<tr style="${isExpanded ? 'border-bottom: none;' : ''}">
         <td>
-          <div style="display:flex;gap:4px;">
-            <button class="dt-action-btn btn-yellow" title="Relaunch" onclick="relaunchTds(${r.id})">
-              <span class="material-symbols-outlined" style="font-size:14px;">restart_alt</span>
-            </button>
-            <button class="dt-action-btn btn-blue" title="Edit" onclick="openTdsForm('edit',${r.id})">
-              <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
-            </button>
-            <button class="dt-action-btn btn-red" title="Hapus" onclick="openDeleteModal('tds',${r.id})">
-              <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
-            </button>
+          <div style="display:flex;align-items:center;gap:4px;">
+            ${expandBtnHtml}
+            ${editBtnHtml}
+            ${deleteBtnHtml}
           </div>
         </td>
         <td style="white-space:nowrap;font-size:12px;">${r.tanggal}</td>
         <td class="no-form-text">${r.noForm || ''}</td>
         <td style="font-weight:600;">${r.nama}</td>
         <td><span style="font-size:12px;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-weight:600;">${r.versi}</span></td>
-        <td>${pdfBtns || '<span style="color:#d1d5db;font-size:11px;">—</span>'}</td>
+        <td>${pdfBtns}</td>
         <td><div class="last-edit-name">${r.lastEditName}</div><div class="last-edit-date">${r.lastEditDate}</div></td>
-        ${approvalCell('rdi','rdi')}
-        ${approvalCell('rdiDir','rdiDir')}
-        ${approvalCell('mktMgr','mktMgr')}
-        ${approvalCell('mktDir','mktDir')}
+        ${approvalCell('rdi')}
+        ${approvalCell('rdiDir')}
+        ${approvalCell('mktMgr')}
+        ${approvalCell('mktDir')}
       </tr>`;
-    }).join('');
+      
+      // If expanded, render children rows
+      if (isExpanded && children.length > 0) {
+        children.forEach(child => {
+          const childPdfLangs = (child.pdf && child.pdf.length > 0) ? child.pdf : [];
+          const childPdfBtns = `<button class="pdf-badge pdf-id" title="Buka PDF ID" onclick="openTdsPdf(${child.id},'ID')" style="cursor:pointer;">ID</button>` +
+            childPdfLangs.filter(l=>l!=='ID').map(lang =>
+              `<button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="openTdsPdf(${child.id},'${lang}')" style="cursor:pointer;">${lang}</button>`).join('');
+            
+          const childApprovalCell = (key) => {
+            const a = child.approvals[key];
+            if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
+            return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove(${child.id},'${key}')">Approve</button></td>`;
+          };
+          
+          const isChildApproved = child.approvals.rdi && child.approvals.rdiDir && child.approvals.mktMgr && child.approvals.mktDir;
+          const childEditBtn = isChildApproved ? '' : `<button class="dt-action-btn btn-blue" title="Edit" onclick="openTdsForm('edit',${child.id})">
+            <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
+          </button>`;
+          const childDeleteBtn = `<button class="dt-action-btn btn-red" title="Hapus" onclick="openDeleteModal('tds',${child.id})">
+            <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+          </button>`;
+          
+          tbodyHtml += `<tr style="background-color: #e2e8f0; border-top: none; border-bottom: none;" class="tds-child-row">
+            <td>
+              <div style="display:flex;align-items:center;gap:4px;padding-left:12px;">
+                <span class="material-symbols-outlined" style="font-size:16px;color:#9ca3af;user-select:none;margin-right:2px;">subdirectory_arrow_right</span>
+                ${childEditBtn}
+                ${childDeleteBtn}
+              </div>
+            </td>
+            <td style="white-space:nowrap;font-size:12px;color:#4b5563;">${child.tanggal}</td>
+            <td class="no-form-text" style="color:#4b5563;">${child.noForm || ''}</td>
+            <td style="font-weight:500;color:#6b7280;padding-left: 20px;">
+              ${child.nama} <span style="font-size:10px;background:#e5e7eb;padding:1px 6px;border-radius:9999px;margin-left:6px;font-weight:600;color:#475569;">History</span>
+            </td>
+            <td><span style="font-size:11px;background:#e2e8f0;padding:2px 8px;border-radius:4px;font-weight:600;color:#475569;">${child.versi}</span></td>
+            <td>${childPdfBtns}</td>
+            <td><div class="last-edit-name" style="color:#4b5563;">${child.lastEditName}</div><div class="last-edit-date" style="color:#9ca3af;">${child.lastEditDate}</div></td>
+            ${childApprovalCell('rdi')}
+            ${childApprovalCell('rdiDir')}
+            ${childApprovalCell('mktMgr')}
+            ${childApprovalCell('mktDir')}
+          </tr>`;
+        });
+        
+        // Add a tiny bottom border spacer row to separate from the next group
+        tbodyHtml += `<tr style="height: 1px; padding: 0; margin: 0; background-color: #e2e8f0; border-bottom: 1px solid #e5e7eb;"><td colspan="11" style="height: 1px; padding: 0; line-height: 1px;"></td></tr>`;
+      }
+    });
+    tbody.innerHTML = tbodyHtml;
   }
-
+  
   // info label
-  const from = tdsFiltered.length ? start + 1 : 0;
-  const to   = Math.min(start + showN, tdsFiltered.length);
+  const from = groupedData.length ? start + 1 : 0;
+  const to   = Math.min(start + showN, groupedData.length);
   document.getElementById('tds-info-label').textContent =
-    `Showing ${from} to ${to} of ${tdsFiltered.length} entries (filtered from ${tdsData.length} total)`;
-
+    `Showing ${from} to ${to} of ${groupedData.length} products (filtered from ${tdsData.length} total entries)`;
+    
   // pagination
   const pg = document.getElementById('tds-pagination');
   pg.innerHTML = '';
@@ -1090,6 +1386,346 @@ function resetTdsFilters() {
 }
 
 function reloadTdsTable() { applyTdsFilters(); }
+
+// ================================================================
+// PDF HELPER
+// ================================================================
+function openTdsPdf(tdsId, lang) {
+  const r = tdsData.find(x => x.id === tdsId);
+  if (!r) { alert('Data TDS tidak ditemukan.'); return; }
+  const slug = r.nama.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const url = `https://avianbrands.com/uploads/tds/${slug}-v${r.versi}-${lang.toLowerCase()}.pdf`;
+  window.open(url, '_blank');
+}
+
+// ================================================================
+// LIST TDS 2 — RENDER (version dropdown, no expand/collapse)
+// ================================================================
+let tds2Filtered = [...tdsData];
+let tds2SortKey = '';
+let tds2SortAsc = true;
+let tds2Page = 1;
+
+function applyTds2Filters() {
+  const nama     = (document.getElementById('t2f-nama')?.value || '').toLowerCase();
+  const kategori = document.getElementById('t2f-kategori')?.value || '';
+  const dateFrom = document.getElementById('t2f-date-from')?.value || '';
+  const dateTo   = document.getElementById('t2f-date-to')?.value || '';
+  const search   = (document.getElementById('tds2-search')?.value || '').toLowerCase();
+
+  // Collect unique product names matching filters
+  const allNames = [...new Set(tdsData.map(r => r.nama))];
+  const matchedNames = allNames.filter(n => {
+    if (nama && !n.toLowerCase().includes(nama)) return false;
+    if (search && !n.toLowerCase().includes(search)) return false;
+    if (kategori) {
+      const hasKat = tdsData.some(r => r.nama === n && r.kategori === kategori);
+      if (!hasKat) return false;
+    }
+    if (dateFrom || dateTo) {
+      const rows = tdsData.filter(r => r.nama === n);
+      const latest = rows.reduce((a,b) => b.versi > a.versi ? b : a, rows[0]);
+      if (latest) {
+        const parts = latest.tanggal.split('/');
+        const rowDate = parts[2] + '-' + parts[1] + '-' + parts[0];
+        if (dateFrom && rowDate < dateFrom) return false;
+        if (dateTo   && rowDate > dateTo)   return false;
+      }
+    }
+    return true;
+  });
+
+  tds2Filtered = matchedNames;
+  tds2Page = 1;
+  renderTds2Table();
+}
+
+function sortTds2(key) {
+  if (tds2SortKey === key) { tds2SortAsc = !tds2SortAsc; }
+  else { tds2SortKey = key; tds2SortAsc = true; }
+  renderTds2Table();
+}
+
+function renderTds2Table() {
+  const tbody = document.getElementById('tds2-tbody');
+  if (!tbody) return;
+
+  // Build group array: one row per unique product name, with all versions
+  let groups = tds2Filtered.map(name => {
+    const versions = tdsData.filter(r => r.nama === name);
+    versions.sort((a, b) => b.versi - a.versi);
+    const latest = versions[0];
+    return { name, latest, versions };
+  });
+
+  // Sort by latest row's property
+  if (tds2SortKey) {
+    groups.sort((a, b) => {
+      let av = a.latest[tds2SortKey] || '', bv = b.latest[tds2SortKey] || '';
+      return (av < bv ? -1 : av > bv ? 1 : 0) * (tds2SortAsc ? 1 : -1);
+    });
+  }
+
+  const showN = parseInt(document.getElementById('tds2-show-count')?.value || 10);
+  const start = (tds2Page - 1) * showN;
+  const pageGroups = groups.slice(start, start + showN);
+  const totalPages = Math.ceil(groups.length / showN);
+
+  if (!pageGroups.length) {
+    tbody.innerHTML = '<tr class="dt-empty"><td colspan="11">Tidak ada data.</td></tr>';
+  } else {
+    let html = '';
+    pageGroups.forEach(g => {
+      const r = g.latest;
+      const versions = g.versions; // sorted desc
+
+      // Version dropdown
+      const verOptions = versions.map(v =>
+        `<option value="${v.id}" ${v.id === r.id ? 'selected' : ''}>v${v.versi} — ${v.tanggal}</option>`
+      ).join('');
+      const verDropdown = `<select style="font-size:11px;border:1px solid #d1d5db;border-radius:4px;padding:2px 4px;background:#f9fafb;cursor:pointer;width:100%;" onchange="onTds2VersionChange(this,${JSON.stringify(g.name).replace(/"/g,'&quot;')})">${verOptions}</select>`;
+
+      // PDF cell: always show ID, plus others from the selected version
+      const pdfLangs2 = (r.pdf && r.pdf.length > 0) ? r.pdf : [];
+      const pdfCell = `<button class="pdf-badge pdf-id" onclick="openTdsPdf(${r.id},'ID')" style="cursor:pointer;">ID</button>` +
+        pdfLangs2.filter(l => l !== 'ID').map(lang =>
+          `<button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="openTdsPdf(${r.id},'${lang}')" style="cursor:pointer;">${lang}</button>`
+        ).join('');
+
+      const approvalCell2 = (key) => {
+        const a = r.approvals[key];
+        if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
+        return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove2(${r.id},'${key}')">Approve</button></td>`;
+      };
+
+      const isApproved = r.approvals.rdi && r.approvals.rdiDir && r.approvals.mktMgr && r.approvals.mktDir;
+      const editBtn = isApproved ? '' : `<button class="dt-action-btn btn-blue" title="Edit" onclick="openTdsForm('edit',${r.id})"><span class="material-symbols-outlined" style="font-size:14px;">edit</span></button>`;
+      const delBtn  = `<button class="dt-action-btn btn-red" title="Hapus" onclick="openDeleteModal('tds',${r.id})"><span class="material-symbols-outlined" style="font-size:14px;">delete</span></button>`;
+
+      html += `<tr data-tds2-name="${r.nama.replace(/"/g,'&quot;')}">
+        <td><div style="display:flex;align-items:center;gap:4px;">${editBtn}${delBtn}</div></td>
+        <td class="tds2-tanggal-cell" style="white-space:nowrap;font-size:12px;">${r.tanggal}</td>
+        <td class="tds2-noform-cell no-form-text">${r.noForm || ''}</td>
+        <td style="font-weight:600;">${r.nama}</td>
+        <td class="tds2-ver-cell">${verDropdown}</td>
+        <td class="tds2-pdf-cell">${pdfCell}</td>
+        <td><div class="last-edit-name">${r.lastEditName}</div><div class="last-edit-date">${r.lastEditDate}</div></td>
+        ${approvalCell2('rdi')}
+        ${approvalCell2('rdiDir')}
+        ${approvalCell2('mktMgr')}
+        ${approvalCell2('mktDir')}
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  }
+
+  const from = groups.length ? start + 1 : 0;
+  const to   = Math.min(start + showN, groups.length);
+  const lbl = document.getElementById('tds2-info-label');
+  if (lbl) lbl.textContent = `Showing ${from} to ${to} of ${groups.length} products`;
+
+  const pg = document.getElementById('tds2-pagination');
+  if (pg) {
+    pg.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const b = document.createElement('button');
+      b.className = 'dt-page-btn' + (i === tds2Page ? ' active' : '');
+      b.textContent = i;
+      b.onclick = () => { tds2Page = i; renderTds2Table(); };
+      pg.appendChild(b);
+    }
+  }
+}
+
+function onTds2VersionChange(sel, productName) {
+  const selectedId = parseInt(sel.value);
+  const r = tdsData.find(x => x.id === selectedId);
+  if (!r) return;
+
+  // Update the cells in the same row
+  const row = sel.closest('tr');
+  if (!row) return;
+
+  // Update tanggal
+  const tanggalCell = row.querySelector('.tds2-tanggal-cell');
+  if (tanggalCell) tanggalCell.textContent = r.tanggal;
+
+  // Update no form
+  const noformCell = row.querySelector('.tds2-noform-cell');
+  if (noformCell) noformCell.textContent = r.noForm || '';
+
+  // Update PDF cell
+  const pdfCell = row.querySelector('.tds2-pdf-cell');
+  if (pdfCell) {
+    const pdfLangs2 = (r.pdf && r.pdf.length > 0) ? r.pdf : [];
+    pdfCell.innerHTML = `<button class="pdf-badge pdf-id" onclick="openTdsPdf(${r.id},'ID')" style="cursor:pointer;">ID</button>` +
+      pdfLangs2.filter(l => l !== 'ID').map(lang =>
+        `<button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="openTdsPdf(${r.id},'${lang}')" style="cursor:pointer;">${lang}</button>`
+      ).join('');
+  }
+}
+
+function doApprove2(tdsId, key) {
+  const r = tdsData.find(x => x.id === tdsId);
+  if (!r) return;
+  r.approvals[key] = { name: LOGGED_IN_USER, date: getTodayStr() };
+  r.lastEditName = LOGGED_IN_USER;
+  r.lastEditDate = getTodayStr();
+  renderTds2Table();
+}
+
+function toggleTds2Filter() {
+  document.getElementById('tds2-filter-panel').classList.toggle('open');
+}
+
+function resetTds2Filters() {
+  ['t2f-nama','t2f-kategori','t2f-date-from','t2f-date-to','tds2-search'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  applyTds2Filters();
+}
+
+function reloadTds2Table() { applyTds2Filters(); }
+
+// ================================================================
+// LIST TDS 3 — MOCK DATA + version dropdown opens PDF directly
+// ================================================================
+const tds3MockData = [
+  { id:1,  noForm:'TDS/AV/0001', nama:'Avian Catylac Interior',    kategori:'Water Based',   tanggal:'10/01/2024', lastEditName:'Lorem Ipsum',        lastEditDate:'10 Januari 2024',    versi:3, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:2,  noForm:'TDS/AV/0002', nama:'Avian Catylac Exterior',    kategori:'Water Based',   tanggal:'15/02/2024', lastEditName:'Dolor Sit Amet',     lastEditDate:'15 Februari 2024',   versi:2, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:3,  noForm:'TDS/AV/0003', nama:'No Drop Waterproof',        kategori:'Waterproofing', tanggal:'20/03/2024', lastEditName:'Consectetur Adipiscing',lastEditDate:'20 Maret 2024',  versi:3, approvals:{rdi:{name:'Lorem Ipsum',date:'1 April 2024'},rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:4,  noForm:'TDS/AV/0004', nama:'Avian Enamel Gloss',        kategori:'Solvent Based', tanggal:'05/04/2024', lastEditName:'Sed Do Eiusmod',     lastEditDate:'5 April 2024',       versi:1, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:5,  noForm:'TDS/AV/0005', nama:'Lenkote Alkali Primer',     kategori:'Water Based',   tanggal:'12/04/2024', lastEditName:'Tempor Incididunt',   lastEditDate:'12 April 2024',      versi:2, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:6,  noForm:'TDS/AV/0006', nama:'Avian Duco Nitrocellulose', kategori:'Solvent Based', tanggal:'18/05/2024', lastEditName:'Ut Labore Dolore',    lastEditDate:'18 Mei 2024',        versi:1, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:7,  noForm:'TDS/AV/0007', nama:'Sunguard Super Gloss',      kategori:'Water Based',   tanggal:'22/05/2024', lastEditName:'Magna Aliqua Dolor',  lastEditDate:'22 Mei 2024',        versi:2, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:8,  noForm:'TDS/AV/0008', nama:'No Lumut Anti-Algae',       kategori:'Water Based',   tanggal:'30/06/2024', lastEditName:'Ut Enim Quis',        lastEditDate:'30 Juni 2024',       versi:3, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:9,  noForm:'TDS/AV/0009', nama:'Avian Plamir Tembok',       kategori:'Construction',  tanggal:'05/07/2024', lastEditName:'Nostrud Exercitation',lastEditDate:'5 Juli 2024',        versi:1, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:10, noForm:'TDS/AV/0010', nama:'Avian Mortar Plester',      kategori:'Construction',  tanggal:'20/08/2024', lastEditName:'Ullamco Laboris Nisi',lastEditDate:'20 Agustus 2024',    versi:2, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:11, noForm:'TDS/AV/0011', nama:'Avian Epoxy Primer',        kategori:'Solvent Based', tanggal:'10/09/2024', lastEditName:'Aliquip Ex Ea Commodo',lastEditDate:'10 September 2024', versi:1, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+  { id:12, noForm:'TDS/AV/0012', nama:'No Drop Anti Bocor',        kategori:'Waterproofing', tanggal:'15/10/2024', lastEditName:'Consequat Duis Aute', lastEditDate:'15 Oktober 2024',    versi:2, approvals:{rdi:null,rdiDir:null,mktMgr:null,mktDir:null} },
+];
+
+let tds3FilteredData = [...tds3MockData];
+let tds3Page = 1;
+
+function applyTds3Filters() {
+  const nama     = (document.getElementById('t3f-nama')?.value || '').toLowerCase();
+  const kategori = document.getElementById('t3f-kategori')?.value || '';
+  const search   = (document.getElementById('tds3-search')?.value || '').toLowerCase();
+
+  tds3FilteredData = tds3MockData.filter(r => {
+    if (nama     && !r.nama.toLowerCase().includes(nama))     return false;
+    if (kategori && r.kategori !== kategori)                  return false;
+    if (search   && !r.nama.toLowerCase().includes(search) && !r.noForm.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  tds3Page = 1;
+  renderTds3Table();
+}
+
+function renderTds3Table() {
+  const tbody = document.getElementById('tds3-tbody');
+  if (!tbody) return;
+
+  const showN = parseInt(document.getElementById('tds3-show-count')?.value || 10);
+  const start = (tds3Page - 1) * showN;
+  const pageRows = tds3FilteredData.slice(start, start + showN);
+  const totalPages = Math.ceil(tds3FilteredData.length / showN);
+
+  if (!pageRows.length) {
+    tbody.innerHTML = '<tr class="dt-empty"><td colspan="11">Tidak ada data.</td></tr>';
+  } else {
+    let html = '';
+    pageRows.forEach(r => {
+      // Build all version options (v1..vN) for this row
+      // Each version option: when selected, immediately open PDF in new tab
+      const maxVer = r.versi;
+      const verOptions = [];
+      for (let v = maxVer; v >= 1; v--) {
+        const slug = r.nama.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const pdfUrl = `https://avianbrands.com/uploads/tds/${slug}-v${v}-id.pdf`;
+        verOptions.push(`<option value="${pdfUrl}" ${v === maxVer ? 'selected' : ''}>v${v}</option>`);
+      }
+      // If only 1 version: show plain badge, no dropdown interaction needed
+      const verCell = maxVer > 1
+        ? `<select style="font-size:11px;border:1px solid #d1d5db;border-radius:4px;padding:2px 6px;background:#f9fafb;cursor:pointer;width:100%;font-weight:600;" onchange="onTds3VersionSelect(this)">
+             ${verOptions.join('')}
+           </select>
+           <span style="font-size:9px;color:#9ca3af;display:block;margin-top:2px;">↑ pilih versi → buka PDF</span>`
+        : `<span style="font-size:12px;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-weight:600;">v1</span>`;
+
+      // PDF badge (ID always shown, opens current/latest version)
+      const slug = r.nama.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const latestPdfUrl = `https://avianbrands.com/uploads/tds/${slug}-v${r.versi}-id.pdf`;
+      const pdfCell = `<button class="pdf-badge pdf-id" onclick="window.open('${latestPdfUrl}','_blank')" style="cursor:pointer;" title="Buka PDF versi terbaru">ID</button>`;
+
+      const apvCell = (key) => {
+        const a = r.approvals[key];
+        if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
+        return `<td class="approve-cell"><button class="approve-btn" onclick="alert('Fitur approve pada mock data.')">Approve</button></td>`;
+      };
+
+      const isApproved = r.approvals.rdi && r.approvals.rdiDir && r.approvals.mktMgr && r.approvals.mktDir;
+      const editBtn = isApproved ? '' : `<button class="dt-action-btn btn-blue" title="Edit" onclick="alert('Edit pada mock data belum tersedia.')"><span class="material-symbols-outlined" style="font-size:14px;">edit</span></button>`;
+      const delBtn  = `<button class="dt-action-btn btn-red" title="Hapus" onclick="alert('Hapus pada mock data belum tersedia.')"><span class="material-symbols-outlined" style="font-size:14px;">delete</span></button>`;
+
+      html += `<tr>
+        <td><div style="display:flex;align-items:center;gap:4px;">${editBtn}${delBtn}</div></td>
+        <td style="white-space:nowrap;font-size:12px;">${r.tanggal}</td>
+        <td class="no-form-text">${r.noForm}</td>
+        <td style="font-weight:600;">${r.nama}</td>
+        <td>${verCell}</td>
+        <td>${pdfCell}</td>
+        <td><div class="last-edit-name">${r.lastEditName}</div><div class="last-edit-date">${r.lastEditDate}</div></td>
+        ${apvCell('rdi')}
+        ${apvCell('rdiDir')}
+        ${apvCell('mktMgr')}
+        ${apvCell('mktDir')}
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  }
+
+  const from = tds3FilteredData.length ? start + 1 : 0;
+  const to   = Math.min(start + showN, tds3FilteredData.length);
+  const lbl  = document.getElementById('tds3-info-label');
+  if (lbl) lbl.textContent = `Showing ${from} to ${to} of ${tds3FilteredData.length} entries`;
+
+  const pg = document.getElementById('tds3-pagination');
+  if (pg) {
+    pg.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const b = document.createElement('button');
+      b.className = 'dt-page-btn' + (i === tds3Page ? ' active' : '');
+      b.textContent = i;
+      b.onclick = () => { tds3Page = i; renderTds3Table(); };
+      pg.appendChild(b);
+    }
+  }
+}
+
+function onTds3VersionSelect(sel) {
+  const url = sel.value;
+  if (url) window.open(url, '_blank');
+}
+
+function toggleTds3Filter() {
+  document.getElementById('tds3-filter-panel').classList.toggle('open');
+}
+
+function resetTds3Filters() {
+  ['t3f-nama','t3f-kategori','tds3-search'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  applyTds3Filters();
+}
+
+function reloadTds3Table() { renderTds3Table(); }
+
+
+
 
 // ================================================================
 // RELAUNCH TDS — open form pre-filled, on save create new row v+1
@@ -1263,7 +1899,7 @@ function validateProductName() {
   
   const match = pmData.find(p => p.nama.toLowerCase() === val.toLowerCase());
   if (match) {
-    err.textContent = `Nama produk "${val}" sudah terdaftar di Product Master. Silakan gunakan opsi 'Produk Lama'.`;
+    err.textContent = `Nama produk "${val}" sudah terdaftar di Database Produk. Silakan gunakan opsi 'Produk Lama'.`;
     err.classList.remove('hidden');
     return false;
   } else {
@@ -1304,11 +1940,13 @@ function updateTdsVersionField() {
 function clearTdsForm() {
   // Reset all selects in form to first option
   const fv = document.getElementById('form-view');
-  fv.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
-  // Clear all text inputs and textareas (skip hidden/readonly)
-  fv.querySelectorAll('input[type="text"], input:not([type]), textarea').forEach(el => {
-    if (!el.readOnly && el.id !== 'tds-versi-input') el.value = '';
-  });
+  if (fv) {
+    fv.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
+    // Clear all text inputs and textareas (skip hidden/readonly)
+    fv.querySelectorAll('input[type="text"], input:not([type]), textarea').forEach(el => {
+      if (!el.readOnly && el.id !== 'tds-versi-input') el.value = '';
+    });
+  }
   // Reset template picker and form area in cara pemakaian
   const katSel = document.getElementById('kategori-produk-select');
   if (katSel) { katSel.value = ''; }
@@ -1330,6 +1968,41 @@ function clearTdsForm() {
 
   // Set to default type
   setProdukType('lama');
+  
+  // Restore dynamic sections to their default HTML
+  if (defaultFiturHtml) {
+    const el = document.getElementById('fitur-table-body');
+    if (el) el.innerHTML = defaultFiturHtml;
+  }
+  if (defaultSpecHtml) {
+    const el = document.getElementById('spec-cards-container');
+    if (el) el.innerHTML = defaultSpecHtml;
+  }
+  if (defaultPrepHtml) {
+    const el = document.getElementById('prep-cards-container');
+    if (el) el.innerHTML = defaultPrepHtml;
+  }
+  if (defaultStorageHtml) {
+    const el = document.getElementById('storage-table-body');
+    if (el) el.innerHTML = defaultStorageHtml;
+  }
+  
+  // Reset checkboxes
+  if (fv) {
+    fv.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      if (cb.classList.contains('spec-toggle')) {
+        const defaultChecked = ['warna', 'penampilan', 'kemasan', 'pengencer', 'bj25', 'daya-sebar', 'tebal-film', 'cara-aplikasi', 'kadar-padatan', 'waktu-kering', 'tenggang-waktu', 'lapis-anjur', 'kekentalan'];
+        cb.checked = defaultChecked.includes(cb.dataset.spec);
+      } else {
+        cb.checked = false;
+      }
+    });
+  }
+  
+  // Reset panduanVisible
+  if (typeof panduanVisible !== 'undefined' && !panduanVisible) {
+    togglePanduanAplikasi();
+  }
 }
 
 function prefillTdsForm(r) {
@@ -1379,11 +2052,17 @@ function openTdsForm(mode, id) {
   } else if (mode === 'relaunch' && id) {
     clearTdsForm();
     const r = tdsData.find(x => x.id === id);
-    if (r) prefillTdsForm(r);
+    if (r) {
+      prefillTdsForm(r);
+      if (r.formData) deserializeTdsForm(r.formData);
+    }
   } else if (mode === 'edit' && id) {
     clearTdsForm();
     const r = tdsData.find(x => x.id === id);
-    if (r) prefillTdsForm(r);
+    if (r) {
+      prefillTdsForm(r);
+      if (r.formData) deserializeTdsForm(r.formData);
+    }
   }
 }
 
@@ -1446,7 +2125,8 @@ function onTdsFormSave() {
       lastEditDate: dateDisplay,
       approvals: { rdi:null, rdiDir:null, mktMgr:null, mktDir:null },
       kategori: kategori || (src ? src.kategori : ''),
-      nama: nama
+      nama: nama,
+      formData: serializeTdsForm()
     };
     tdsData.unshift(newRow);
     syncPmFromTds();
@@ -1455,7 +2135,8 @@ function onTdsFormSave() {
       id: nextTdsId++, tanggal: dateStr, noForm: 'TDS/' + nextTdsId,
       nama: nama, kategori: kategori, versi: verVal,
       pdf: [], lastEditName: LOGGED_IN_USER, lastEditDate: dateDisplay,
-      approvals: { rdi:null, rdiDir:null, mktMgr:null, mktDir:null }
+      approvals: { rdi:null, rdiDir:null, mktMgr:null, mktDir:null },
+      formData: serializeTdsForm()
     };
     tdsData.unshift(newRow);
     if (!isLama) {
@@ -1477,10 +2158,20 @@ function onTdsFormSave() {
     const editId = parseInt(fv.dataset.formId);
     const r = tdsData.find(x => x.id === editId);
     if (r) {
-      r.nama = nama;
-      r.kategori = kategori;
-      r.lastEditName = LOGGED_IN_USER;
-      r.lastEditDate = dateDisplay;
+      const newRow = {
+        ...r,
+        id: nextTdsId++,
+        tanggal: dateStr,
+        nama: nama,
+        kategori: kategori,
+        versi: r.versi + 1,
+        lastEditName: LOGGED_IN_USER,
+        lastEditDate: dateDisplay,
+        approvals: { rdi: null, rdiDir: null, mktMgr: null, mktDir: null },
+        formData: serializeTdsForm(),
+        pdf: []
+      };
+      tdsData.unshift(newRow);
       syncPmFromTds();
     }
   }
@@ -1649,7 +2340,7 @@ function openPmAdd() {
   
   // Set title
   const titleEl = document.getElementById('pm-edit-title');
-  if (titleEl) titleEl.textContent = 'Tambah Product Master';
+  if (titleEl) titleEl.textContent = 'Tambah Database Produk';
   
   // Reset fields
   document.getElementById('pm-edit-nama').value = '';
@@ -1678,7 +2369,7 @@ function openPmEdit(id) {
   
   // Set title
   const titleEl = document.getElementById('pm-edit-title');
-  if (titleEl) titleEl.textContent = 'Edit Product Master';
+  if (titleEl) titleEl.textContent = 'Edit Database Produk';
   
   // Show history table
   const historyWrapper = document.getElementById('pm-edit-history-wrapper');
@@ -1822,10 +2513,140 @@ function confirmDelete() {
 }
 
 // ================================================================
+// FORM STATE SERIALIZATION & DESERIALIZATION
+// ================================================================
+let defaultFiturHtml = '';
+let defaultSpecHtml = '';
+let defaultPrepHtml = '';
+let defaultTmplHtml = '';
+let defaultStorageHtml = '';
+
+function initDefaultTemplates() {
+  if (!defaultFiturHtml) defaultFiturHtml = document.getElementById('fitur-table-body')?.innerHTML || '';
+  if (!defaultSpecHtml) defaultSpecHtml = document.getElementById('spec-cards-container')?.innerHTML || '';
+  if (!defaultPrepHtml) defaultPrepHtml = document.getElementById('prep-cards-container')?.innerHTML || '';
+  if (!defaultTmplHtml) defaultTmplHtml = document.getElementById('tmpl-form-area')?.innerHTML || '';
+  if (!defaultStorageHtml) defaultStorageHtml = document.getElementById('storage-table-body')?.innerHTML || '';
+}
+document.addEventListener("DOMContentLoaded", initDefaultTemplates);
+setTimeout(initDefaultTemplates, 100);
+
+function serializeTdsForm() {
+  const form = document.getElementById('form-view');
+  if (!form) return null;
+  
+  const fiturHtml = document.getElementById('fitur-table-body')?.innerHTML || '';
+  const specHtml = document.getElementById('spec-cards-container')?.innerHTML || '';
+  const prepHtml = document.getElementById('prep-cards-container')?.innerHTML || '';
+  const tmplHtml = document.getElementById('tmpl-form-area')?.innerHTML || '';
+  const storageHtml = document.getElementById('storage-table-body')?.innerHTML || '';
+  
+  const specToggles = [];
+  form.querySelectorAll('.spec-toggle').forEach((cb) => {
+    specToggles.push({ spec: cb.dataset.spec, checked: cb.checked });
+  });
+  
+  const checkboxes = [];
+  form.querySelectorAll('input[type="checkbox"]:not(.spec-toggle)').forEach((cb, idx) => {
+    checkboxes.push({ idx: idx, checked: cb.checked });
+  });
+  
+  const inputs = [];
+  form.querySelectorAll('input[type="text"], textarea, select').forEach((el, idx) => {
+    inputs.push({ idx: idx, value: el.value });
+  });
+  
+  const imgPrevSrc = document.getElementById('tds-product-image-preview')?.src || '';
+  const imgBase64 = tdsUploadedImageBase64 || '';
+  const hoverBtnDisplay = document.getElementById('tds-image-hover-btn')?.style.display || '';
+  
+  return {
+    fiturHtml,
+    specHtml,
+    prepHtml,
+    tmplHtml,
+    storageHtml,
+    specToggles,
+    checkboxes,
+    inputs,
+    imgPrevSrc,
+    imgBase64,
+    hoverBtnDisplay,
+    panduanVisibleSaved: panduanVisible
+  };
+}
+
+function deserializeTdsForm(data) {
+  if (!data) return;
+  const form = document.getElementById('form-view');
+  if (!form) return;
+  
+  if (data.fiturHtml !== undefined) {
+    const el = document.getElementById('fitur-table-body');
+    if (el) el.innerHTML = data.fiturHtml;
+  }
+  if (data.specHtml !== undefined) {
+    const el = document.getElementById('spec-cards-container');
+    if (el) el.innerHTML = data.specHtml;
+  }
+  if (data.prepHtml !== undefined) {
+    const el = document.getElementById('prep-cards-container');
+    if (el) el.innerHTML = data.prepHtml;
+  }
+  if (data.tmplHtml !== undefined) {
+    const el = document.getElementById('tmpl-form-area');
+    if (el) el.innerHTML = data.tmplHtml;
+  }
+  if (data.storageHtml !== undefined) {
+    const el = document.getElementById('storage-table-body');
+    if (el) el.innerHTML = data.storageHtml;
+  }
+  
+  if (data.specToggles) {
+    data.specToggles.forEach(item => {
+      const cb = form.querySelector(`.spec-toggle[data-spec="${item.spec}"]`);
+      if (cb) cb.checked = item.checked;
+    });
+  }
+  
+  if (data.checkboxes) {
+    const cbs = form.querySelectorAll('input[type="checkbox"]:not(.spec-toggle)');
+    data.checkboxes.forEach(item => {
+      if (cbs[item.idx]) cbs[item.idx].checked = item.checked;
+    });
+  }
+  
+  if (data.inputs) {
+    const els = form.querySelectorAll('input[type="text"], textarea, select');
+    data.inputs.forEach(item => {
+      if (els[item.idx]) els[item.idx].value = item.value;
+    });
+  }
+  
+  if (data.imgPrevSrc) {
+    const imgPrev = document.getElementById('tds-product-image-preview');
+    if (imgPrev) imgPrev.src = data.imgPrevSrc;
+  }
+  if (data.imgBase64 !== undefined) {
+    tdsUploadedImageBase64 = data.imgBase64;
+  }
+  if (data.hoverBtnDisplay !== undefined) {
+    const hoverBtn = document.getElementById('tds-image-hover-btn');
+    if (hoverBtn) hoverBtn.style.display = data.hoverBtnDisplay;
+  }
+  if (data.panduanVisibleSaved !== undefined) {
+    if (panduanVisible !== data.panduanVisibleSaved) {
+      togglePanduanAplikasi();
+    }
+  }
+}
+
+// ================================================================
 // INIT
 // ================================================================
 applyTdsFilters();
 setProdukType('lama');
+initDefaultTemplates();
 </script>
 <div id="form-view" style="display:none;"><div class="p-8 flex-1 overflow-y-auto space-y-8 max-w-7xl mx-auto w-full">
 <!-- Page Title -->
@@ -1880,7 +2701,7 @@ setProdukType('lama');
 <div class="mt-4">
 <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">Green Label Singapore</label>
 <div class="max-w-xs">
-<select class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary">
+<select id="tds-green-label-select" class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary">
 <option value="ya">Ya</option><option value="tidak">Tidak</option>
 </select>
 </div>
@@ -1991,7 +2812,7 @@ setProdukType('lama');
 <div class="p-6 space-y-4">
 <div>
 <label class="block text-xs font-bold text-gray-600 mb-1">Keterangan Tambahan</label>
-<textarea class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary" placeholder="Masukkan keterangan tambahan produk..." rows="3">Penurunan suhu ruangan hingga 7°C tergantung pada warna, substrat, dan suhu udara sekitar. Agar bisa menurunkan suhu hingga 7°C dibutuhkan min 3 lapis.</textarea>
+<textarea id="tds-keterangan-tambahan" class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary" placeholder="Masukkan keterangan tambahan produk..." rows="3">Penurunan suhu ruangan hingga 7°C tergantung pada warna, substrat, dan suhu udara sekitar. Agar bisa menurunkan suhu hingga 7°C dibutuhkan min 3 lapis.</textarea>
 </div>
 </div>
 </section>
