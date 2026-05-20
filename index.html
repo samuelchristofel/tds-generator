@@ -654,6 +654,9 @@ function toggleSpecCard(specId, isChecked) {
           <button class="dt-btn" onclick="renderPmTable()">
             <span class="material-symbols-outlined" style="font-size:15px;">refresh</span> Reload
           </button>
+          <button class="dt-btn dt-btn-primary" onclick="openPmAdd()">
+            <span class="material-symbols-outlined" style="font-size:15px;">add</span> Add
+          </button>
         </div>
       </div>
 
@@ -763,7 +766,7 @@ function toggleSpecCard(specId, isChecked) {
       <button onclick="closePmEdit()" class="dt-btn">
         <span class="material-symbols-outlined" style="font-size:15px;">arrow_back</span> Kembali
       </button>
-      <h2 style="font-size:20px;font-weight:800;color:#111827;">Edit Product Master</h2>
+      <h2 id="pm-edit-title" style="font-size:20px;font-weight:800;color:#111827;">Edit Product Master</h2>
     </div>
 
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" style="background: #fff;">
@@ -810,7 +813,7 @@ function toggleSpecCard(specId, isChecked) {
     </div>
 
     <!-- TDS History Table -->
-    <div class="dt-wrapper">
+    <div class="dt-wrapper" id="pm-edit-history-wrapper">
       <div class="dt-topbar">
         <span style="font-size:13px;font-weight:700;color:#374151;">Riwayat Dokumen TDS</span>
       </div>
@@ -1101,10 +1104,27 @@ function relaunchTds(id) {
 // ================================================================
 // TDS FORM OPEN/CLOSE
 // ================================================================
+let tdsUploadedImageBase64 = '';
+function previewTdsProductImage(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('tds-product-image-preview').src = e.target.result;
+      tdsUploadedImageBase64 = e.target.result;
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 function setProdukType(type) {
   const btnLama = document.getElementById('btn-produk-lama');
   const btnBaru = document.getElementById('btn-produk-baru');
   const container = document.getElementById('product-selection-container');
+  
+  const katSel = document.getElementById('kategori-produk-select');
+  const descInp = document.getElementById('tds-deskripsi-input');
+  const imgPrev = document.getElementById('tds-product-image-preview');
+  const hoverBtn = document.getElementById('tds-image-hover-btn');
   
   if (type === 'lama') {
     if (btnLama) btnLama.className = 'px-6 py-2 bg-avian-primary text-white text-sm font-semibold rounded-l border border-avian-primary';
@@ -1123,6 +1143,7 @@ function setProdukType(type) {
         </select>
       </div>`;
     }
+    onProductSelectChange();
   } else {
     if (btnBaru) btnBaru.className = 'px-6 py-2 bg-[#1a5c2a] text-white text-sm font-semibold rounded-r border border-[#1a5c2a]';
     if (btnLama) btnLama.className = 'px-6 py-2 bg-white text-gray-700 text-sm font-semibold rounded-l border border-gray-300 hover:bg-gray-50';
@@ -1134,12 +1155,93 @@ function setProdukType(type) {
         <p id="product-validation-error" class="text-xs text-red-500 mt-1 hidden"></p>
       </div>`;
     }
+    
+    // Enable fields for New Product
+    if (katSel) {
+      katSel.disabled = false;
+      katSel.classList.remove('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+      katSel.value = '';
+    }
+    if (descInp) {
+      descInp.readOnly = false;
+      descInp.classList.remove('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+      descInp.value = '';
+    }
+    if (hoverBtn) {
+      hoverBtn.style.display = 'flex';
+    }
+    if (imgPrev) {
+      imgPrev.src = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4';
+    }
   }
   updateTdsVersionField();
 }
 
 function onProductSelectChange() {
   updateTdsVersionField();
+  
+  const sel = document.getElementById('produk-lama-select');
+  if (!sel) return;
+  const productName = sel.value;
+  
+  const katSel = document.getElementById('kategori-produk-select');
+  const descInp = document.getElementById('tds-deskripsi-input');
+  const imgPrev = document.getElementById('tds-product-image-preview');
+  const hoverBtn = document.getElementById('tds-image-hover-btn');
+  
+  if (productName) {
+    const product = pmData.find(p => p.nama.toLowerCase() === productName.toLowerCase());
+    if (product) {
+      // Autofill Kategori
+      if (katSel) {
+        const katMap = {
+          'Solvent Based': 'solvent-based',
+          'Construction': 'construction',
+          'Waterproofing': 'waterproofing',
+          'Water Based': 'water-based'
+        };
+        katSel.value = katMap[product.kategori] || '';
+        katSel.disabled = true;
+        katSel.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+      }
+      
+      // Autofill Deskripsi
+      if (descInp) {
+        descInp.value = product.deskripsi || '';
+        descInp.readOnly = true;
+        descInp.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+      }
+      
+      // Autofill Gambar
+      if (imgPrev) {
+        imgPrev.src = product.gambar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4';
+      }
+      
+      // Hide Ubah Gambar Button
+      if (hoverBtn) {
+        hoverBtn.style.display = 'none';
+      }
+      return;
+    }
+  }
+  
+  // If no product selected, reset fields but keep them read-only (since it is Produk Lama type)
+  if (katSel) {
+    katSel.value = '';
+    katSel.disabled = true;
+    katSel.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+  }
+  if (descInp) {
+    descInp.value = '';
+    descInp.readOnly = true;
+    descInp.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+  }
+  if (imgPrev) {
+    imgPrev.src = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4';
+  }
+  if (hoverBtn) {
+    hoverBtn.style.display = 'none';
+  }
 }
 
 function onProductInputChange() {
@@ -1219,20 +1321,19 @@ function clearTdsForm() {
   const formArea = document.getElementById('tmpl-form-area');
   if (formArea) { formArea.innerHTML = ''; renderAddStepBar(formArea); }
   
+  // Reset uploaded image state
+  tdsUploadedImageBase64 = '';
+  const imgPrev = document.getElementById('tds-product-image-preview');
+  if (imgPrev) {
+    imgPrev.src = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4';
+  }
+
   // Set to default type
   setProdukType('lama');
 }
 
 function prefillTdsForm(r) {
   if (!r) return;
-  // set kategori
-  const katSel = document.getElementById('kategori-produk-select');
-  if (katSel) {
-    const katMap = {'Solvent Based':'solvent-based','Construction':'construction','Waterproofing':'waterproofing','Water Based':'water-based'};
-    const val = katMap[r.kategori] || '';
-    katSel.value = val;
-    if (val) onKategoriChange(val);
-  }
   
   // Relaunch or edit sets type to Produk Lama since it already exists
   setProdukType('lama');
@@ -1245,6 +1346,15 @@ function prefillTdsForm(r) {
       sel.appendChild(opt);
     }
     sel.value = r.nama;
+    onProductSelectChange();
+  }
+  
+  // set kategori
+  const katSel = document.getElementById('kategori-produk-select');
+  if (katSel) {
+    const katMap = {'Solvent Based':'solvent-based','Construction':'construction','Waterproofing':'waterproofing','Water Based':'water-based'};
+    const val = katMap[r.kategori] || '';
+    katSel.value = val;
   }
   
   const fv = document.getElementById('form-view');
@@ -1254,12 +1364,6 @@ function prefillTdsForm(r) {
     if (verInput) verInput.value = r.versi;
   } else {
     updateTdsVersionField();
-  }
-  
-  const pmProduct = pmData.find(p => p.nama.toLowerCase() === r.nama.toLowerCase());
-  const descTextarea = fv.querySelector('textarea');
-  if (descTextarea) {
-    descTextarea.value = pmProduct ? pmProduct.deskripsi : '';
   }
 }
 
@@ -1354,6 +1458,20 @@ function onTdsFormSave() {
       approvals: { rdi:null, rdiDir:null, mktMgr:null, mktDir:null }
     };
     tdsData.unshift(newRow);
+    if (!isLama) {
+      const getAbbreviation = (n) => n.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase();
+      const desc = document.getElementById('tds-deskripsi-input').value.trim();
+      const img = tdsUploadedImageBase64 || `https://placehold.co/60x60/006442/white?text=${getAbbreviation(nama)}`;
+      pmData.push({
+        id: newRow.id,
+        nama: nama,
+        kategori: kategori,
+        versi: 1,
+        deskripsi: desc || `Cat premium berkualitas tinggi dari Avian Brands untuk kategori ${kategori}.`,
+        gambar: img,
+        linkTds: '#'
+      });
+    }
     syncPmFromTds();
   } else if (mode === 'edit') {
     const editId = parseInt(fv.dataset.formId);
@@ -1526,10 +1644,45 @@ function populatePmHistoryTable(productName, tbodyId) {
   }
 }
 
+function openPmAdd() {
+  pmEditId = null;
+  
+  // Set title
+  const titleEl = document.getElementById('pm-edit-title');
+  if (titleEl) titleEl.textContent = 'Tambah Product Master';
+  
+  // Reset fields
+  document.getElementById('pm-edit-nama').value = '';
+  document.getElementById('pm-edit-kategori').value = '';
+  document.getElementById('pm-edit-deskripsi').value = '';
+  
+  const prev = document.getElementById('pm-edit-gambar-preview');
+  if (prev) {
+    prev.innerHTML = '<span class="text-gray-300 text-xs font-semibold">Preview Gambar</span>';
+    delete prev.dataset.base64;
+  }
+  
+  // Hide history table
+  const historyWrapper = document.getElementById('pm-edit-history-wrapper');
+  if (historyWrapper) historyWrapper.style.display = 'none';
+  
+  document.getElementById('pm-list-section').style.display = 'none';
+  document.getElementById('pm-view-section').style.display = 'none';
+  document.getElementById('pm-edit-section').style.display = 'block';
+}
+
 function openPmEdit(id) {
   pmEditId = id;
   const r = pmData.find(x => x.id === id);
   if (!r) return;
+  
+  // Set title
+  const titleEl = document.getElementById('pm-edit-title');
+  if (titleEl) titleEl.textContent = 'Edit Product Master';
+  
+  // Show history table
+  const historyWrapper = document.getElementById('pm-edit-history-wrapper');
+  if (historyWrapper) historyWrapper.style.display = 'block';
   
   document.getElementById('pm-edit-nama').value = r.nama;
   document.getElementById('pm-edit-kategori').value = r.kategori;
@@ -1570,37 +1723,72 @@ function previewPmEditImage(input) {
 }
 
 function savePmEdit() {
-  const r = pmData.find(x => x.id === pmEditId);
-  if (!r) return;
-  
-  const originalName = r.nama;
   const newName = document.getElementById('pm-edit-nama').value.trim();
   const newKategori = document.getElementById('pm-edit-kategori').value;
-  const newDeskripsi = document.getElementById('pm-edit-deskripsi').value;
+  const newDeskripsi = document.getElementById('pm-edit-deskripsi').value.trim();
   
   if (!newName) {
     alert("Nama produk tidak boleh kosong!");
     return;
   }
-  
-  r.nama = newName;
-  r.kategori = newKategori;
-  r.deskripsi = newDeskripsi;
-  
-  // Save preview base64 image if uploaded
-  const prev = document.getElementById('pm-edit-gambar-preview');
-  if (prev && prev.dataset.base64) {
-    r.gambar = prev.dataset.base64;
-    delete prev.dataset.base64;
+  if (!newKategori) {
+    alert("Kategori produk tidak boleh kosong!");
+    return;
   }
   
-  // Sync name/category update back to tdsData
-  tdsData.forEach(t => {
-    if (t.nama.toLowerCase() === originalName.toLowerCase()) {
-      t.nama = newName;
-      t.kategori = newKategori;
+  const prev = document.getElementById('pm-edit-gambar-preview');
+  const base64Image = (prev && prev.dataset.base64) ? prev.dataset.base64 : '';
+  
+  if (pmEditId === null) {
+    // ADD MODE
+    // Check if name already exists
+    const dup = pmData.find(x => x.nama.toLowerCase() === newName.toLowerCase());
+    if (dup) {
+      alert(`Produk dengan nama "${newName}" sudah terdaftar!`);
+      return;
     }
-  });
+    
+    const newId = pmData.length ? Math.max(...pmData.map(p => p.id)) + 1 : 1;
+    const getAbbreviation = (n) => n.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase();
+    const finalImage = base64Image || `https://placehold.co/60x60/006442/white?text=${getAbbreviation(newName)}`;
+    
+    pmData.push({
+      id: newId,
+      nama: newName,
+      kategori: newKategori,
+      versi: 1,
+      deskripsi: newDeskripsi || `Cat premium berkualitas tinggi dari Avian Brands untuk kategori ${newKategori}.`,
+      gambar: finalImage,
+      linkTds: '#'
+    });
+    
+    if (prev) delete prev.dataset.base64;
+    alert('Produk baru berhasil ditambahkan!');
+  } else {
+    // EDIT MODE
+    const r = pmData.find(x => x.id === pmEditId);
+    if (!r) return;
+    
+    const originalName = r.nama;
+    r.nama = newName;
+    r.kategori = newKategori;
+    r.deskripsi = newDeskripsi;
+    
+    if (base64Image) {
+      r.gambar = base64Image;
+      if (prev) delete prev.dataset.base64;
+    }
+    
+    // Sync name/category update back to tdsData
+    tdsData.forEach(t => {
+      if (t.nama.toLowerCase() === originalName.toLowerCase()) {
+        t.nama = newName;
+        t.kategori = newKategori;
+      }
+    });
+    
+    alert('Produk Master berhasil diperbarui!');
+  }
   
   closePmEdit();
 }
@@ -1687,7 +1875,7 @@ setProdukType('lama');
 </div>
 <div>
 <label class="block text-xs font-bold text-gray-600 mb-2">DESKRIPSI PRODUK</label>
-<textarea class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary" placeholder="Masukkan deskripsi produk..." rows="6">No Drop Anti Panas adalah cat pelapis anti bocor yang sangat kuat, dapat menurunkan suhu ruangan hingga 7°C karena memiliki teknologi UV Shield, teknologi kedap airnya melindungi sehingga tembok tidak lembab, elastis, anti jamur dan lumut.</textarea>
+<textarea id="tds-deskripsi-input" class="w-full border-gray-300 rounded text-sm focus:ring-avian-primary focus:border-avian-primary" placeholder="Masukkan deskripsi produk..." rows="6">No Drop Anti Panas adalah cat pelapis anti bocor yang sangat kuat, dapat menurunkan suhu ruangan hingga 7°C karena memiliki teknologi UV Shield, teknologi kedap airnya melindungi sehingga tembok tidak lembab, elastis, anti jamur dan lumut.</textarea>
 </div>
 <div class="mt-4">
 <label class="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">Green Label Singapore</label>
@@ -1700,10 +1888,11 @@ setProdukType('lama');
 </div>
 <div class="md:col-span-4">
 <label class="block text-xs font-bold text-gray-600 mb-2">GAMBAR PRODUK</label>
-<div class="border-2 border-dashed border-gray-300 rounded-lg h-72 flex flex-col items-center justify-center bg-gray-50 group hover:border-avian-primary transition-colors cursor-pointer relative">
-<img alt="Product Preview" class="max-h-56 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4"/>
-<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-<button class="bg-white px-3 py-1 rounded text-xs font-bold shadow-sm">UBAH GAMBAR</button>
+<div class="border-2 border-dashed border-gray-300 rounded-lg h-72 flex flex-col items-center justify-center bg-gray-50 group hover:border-avian-primary transition-colors cursor-pointer relative" onclick="if(document.getElementById('tds-image-hover-btn').style.display !== 'none') document.getElementById('tds-product-image-input').click()">
+<img id="tds-product-image-preview" alt="Product Preview" class="max-h-56 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZOSsmK13FaJurHQgywKHi0Q5OmNF_3DWzbTyZXJbhh_O9FgXmJJz_ccHotZHb2uKdwlRG2w2Aw9zEDGYFPPjpGajP7DOCTIPWsE8uPAz_91vDNegq4aXZdXHuRjQ1k084aWoM13Ic7DiEQTAF5Lh2puvnyyd7vbx8arn8Av7ZtOunQk6-PKbjW3S9Ot7OR3Sw77TT9PNC4g7BmFmPW70qWLgRoKELyoazmiWWKP0ULib69g__0OwNNOSCb-A2FvHZ3HJbyRSewF4"/>
+<input type="file" accept="image/*" id="tds-product-image-input" style="display: none;" onchange="previewTdsProductImage(this)"/>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity" id="tds-image-hover-btn">
+<button type="button" class="bg-white px-3 py-1 rounded text-xs font-bold shadow-sm">UBAH GAMBAR</button>
 </div>
 </div>
 </div>
