@@ -1025,6 +1025,21 @@ function toggleSpecCard(specId, isChecked) {
   </div>
 </div>
 
+<div class="modal-overlay" id="req-del-modal">
+  <div class="modal-box">
+    <div class="modal-title">Request Hapus TDS?</div>
+    <div class="modal-desc" id="req-del-modal-desc">TDS ini sudah full approve. Kirim request hapus ke RDI DIR dan MM?</div>
+    <div style="margin-top:12px; padding:10px; background:#f9fafb; border-radius:6px; font-size:12px; color:#4b5563;">
+      <div><strong>Request By:</strong> <span id="req-del-by"></span></div>
+      <div style="margin-top:4px;"><strong>Tanggal:</strong> <span id="req-del-date"></span></div>
+    </div>
+    <div class="modal-actions" style="margin-top: 16px;">
+      <button class="modal-cancel" onclick="closeReqDelModal()">Batal</button>
+      <button class="modal-confirm-del" onclick="confirmReqDel()">Kirim Request</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ================================================================
 // LOGGED IN USER (hardcoded)
@@ -1252,6 +1267,11 @@ function renderTdsTable() {
           `<button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="openTdsPdf(${r.id},'${lang}')" style="cursor:pointer;">${lang}</button>`).join('');
         
       const approvalCell = (key) => {
+        if (r.deleteRequest && (key === 'rdiDir' || key === 'mktMgr')) {
+          const a = r.deleteApprovals && r.deleteApprovals[key];
+          if (a) return `<td class="approve-cell"><span class="approved-check" style="color:#ef4444">✓ Del</span><div class="approved-info" style="color:#ef4444">${a.name}<br/>${a.date}</div></td>`;
+          return `<td class="approve-cell"><button class="approve-btn" style="background:#ef4444; border-color:#ef4444; color:#fff" title="Requested by: ${r.deleteReqBy} on ${r.deleteReqDate}" onclick="doApproveDelete(${r.id},'${key}')">Appr. Del</button></td>`;
+        }
         const a = r.approvals[key];
         if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
         return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove(${r.id},'${key}')">Approve</button></td>`;
@@ -1303,6 +1323,11 @@ function renderTdsTable() {
               `<button class="pdf-badge pdf-${lang.toLowerCase()}" onclick="openTdsPdf(${child.id},'${lang}')" style="cursor:pointer;">${lang}</button>`).join('');
             
           const childApprovalCell = (key) => {
+            if (child.deleteRequest && (key === 'rdiDir' || key === 'mktMgr')) {
+              const a = child.deleteApprovals && child.deleteApprovals[key];
+              if (a) return `<td class="approve-cell"><span class="approved-check" style="color:#ef4444">✓ Del</span><div class="approved-info" style="color:#ef4444">${a.name}<br/>${a.date}</div></td>`;
+              return `<td class="approve-cell"><button class="approve-btn" style="background:#ef4444; border-color:#ef4444; color:#fff" title="Requested by: ${child.deleteReqBy} on ${child.deleteReqDate}" onclick="doApproveDelete(${child.id},'${key}')">Appr. Del</button></td>`;
+            }
             const a = child.approvals[key];
             if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
             return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove(${child.id},'${key}')">Approve</button></td>`;
@@ -1493,6 +1518,11 @@ function renderTds2Table() {
         ).join('');
 
       const approvalCell2 = (key) => {
+        if (r.deleteRequest && (key === 'rdiDir' || key === 'mktMgr')) {
+          const a = r.deleteApprovals && r.deleteApprovals[key];
+          if (a) return `<td class="approve-cell"><span class="approved-check" style="color:#ef4444">✓ Del</span><div class="approved-info" style="color:#ef4444">${a.name}<br/>${a.date}</div></td>`;
+          return `<td class="approve-cell"><button class="approve-btn" style="background:#ef4444; border-color:#ef4444; color:#fff" title="Requested by: ${r.deleteReqBy} on ${r.deleteReqDate}" onclick="doApproveDelete(${r.id},'${key}')">Appr. Del</button></td>`;
+        }
         const a = r.approvals[key];
         if (a) return `<td class="approve-cell"><span class="approved-check">✓</span><div class="approved-info">${a.name}<br/>${a.date}</div></td>`;
         return `<td class="approve-cell"><button class="approve-btn" onclick="doApprove2(${r.id},'${key}')">Approve</button></td>`;
@@ -1573,6 +1603,19 @@ function doApprove2(tdsId, key) {
   r.lastEditDate = getTodayStr();
   renderTds2Table();
 }
+
+function doApproveDelete(tdsId, key) {
+  const r = tdsData.find(x => x.id === tdsId);
+  if (!r) return;
+  r.deleteApprovals[key] = { name: LOGGED_IN_USER, date: getTodayStr() };
+  if (r.deleteApprovals.rdiDir && r.deleteApprovals.mktMgr) {
+    alert(`TDS "${r.nama}" telah disetujui untuk dihapus oleh RDI DIR dan MM. Data berhasil dihapus permanen.`);
+    tdsData = tdsData.filter(x => x.id !== tdsId);
+  }
+  applyTdsFilters();
+  applyTds2Filters();
+}
+
 
 function toggleTds2Filter() {
   document.getElementById('tds2-filter-panel').classList.toggle('open');
@@ -2493,11 +2536,41 @@ function savePmEdit() {
 // ================================================================
 // DELETE (shared)
 // ================================================================
+let reqDelTarget = null;
+function closeReqDelModal() {
+  reqDelTarget = null;
+  document.getElementById('req-del-modal').classList.remove('open');
+}
+function confirmReqDel() {
+  if (!reqDelTarget) return;
+  const data = reqDelTarget;
+  data.deleteRequest = true;
+  data.deleteApprovals = { rdiDir: null, mktMgr: null };
+  data.deleteReqBy = LOGGED_IN_USER;
+  data.deleteReqDate = getTodayStr();
+  applyTdsFilters();
+  applyTds2Filters();
+  closeReqDelModal();
+}
+
 let deleteTarget = null;
 
 function openDeleteModal(type, id) {
-  deleteTarget = { type, id };
   const data = type === 'tds' ? tdsData.find(x=>x.id===id) : pmData.find(x=>x.id===id);
+
+  if (type === 'tds' && data) {
+    const isApproved = data.approvals && data.approvals.rdi && data.approvals.rdiDir && data.approvals.mktMgr && data.approvals.mktDir;
+    if (isApproved) {
+      reqDelTarget = data;
+      document.getElementById('req-del-modal-desc').textContent = `TDS "${data.nama}" sudah full approve. Kirim request hapus ke RDI DIR dan MM?`;
+      document.getElementById('req-del-by').textContent = LOGGED_IN_USER;
+      document.getElementById('req-del-date').textContent = getTodayStr();
+      document.getElementById('req-del-modal').classList.add('open');
+      return;
+    }
+  }
+
+  deleteTarget = { type, id };
   document.getElementById('delete-modal-desc').textContent =
     `"${data ? data.nama : ''}" akan dihapus permanen dan tidak dapat dikembalikan.`;
   document.getElementById('delete-modal').classList.add('open');
