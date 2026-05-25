@@ -1944,7 +1944,13 @@ function clearTdsForm() {
     fv.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
     // Clear all text inputs and textareas (skip hidden/readonly)
     fv.querySelectorAll('input[type="text"], input:not([type]), textarea').forEach(el => {
-      if (!el.readOnly && el.id !== 'tds-versi-input') el.value = '';
+      if (!el.readOnly && el.id !== 'tds-versi-input') {
+        if (el.classList.contains('airless-val')) {
+          el.value = el.defaultValue;
+        } else {
+          el.value = '';
+        }
+      }
     });
   }
   // Reset template picker and form area in cara pemakaian
@@ -3098,9 +3104,9 @@ initDefaultTemplates();
     </div>
     <div id="panduan-aplikasi-box" class="airless-panel max-w-lg">
       <div class="airless-grid">
-        <span class="airless-key">Nozzle tip</span><input class="airless-val" type="text" value='0.021–0.027"'/>
-        <span class="airless-key">Sudut Penyemprotan</span><input class="airless-val" type="text" value="65–80°"/>
-        <span class="airless-key">Tekanan pada nosel</span><input class="airless-val" type="text" value="140–190 kg/cm² (2100 psi)"/>
+        <span class="airless-key">Nozzle tip</span><input class="airless-val" type="text" value="0.021–0.027&quot;" placeholder="0.021–0.027&quot;"/>
+        <span class="airless-key">Sudut Penyemprotan</span><input class="airless-val" type="text" value="65–80°" placeholder="65–80°"/>
+        <span class="airless-key">Tekanan pada nosel</span><input class="airless-val" type="text" value="140–190 kg/cm² (2100 psi)" placeholder="140–190 kg/cm² (2100 psi)"/>
       </div>
     </div>
     <p class="mt-2 text-[10px] text-gray-400 italic" id="panduan-hidden-note" style="display:none;">* Panduan aplikasi airless spray tidak akan ditampilkan di dokumen.</p>
